@@ -58,6 +58,27 @@ int print_matrix(FILE *fp, matrix_t *m)
     return elementCount;
 }
 
+matrix_t *matrix_product(matrix_t *matrix1, matrix_t *matrix2)
+{
+    matrix_t *result = create_matrix(matrix1->rows, matrix2->cols);
+
+    for (int i = 0; i < matrix1->rows; i++)
+    {
+        for (int j = 0; j < matrix2->cols; j++)
+        {
+            double acum = 0;
+            for (int k = 0; k < matrix1->cols; k++)
+            {
+                acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
+            }
+
+            result->array[matrix2->cols + j] = acum;
+        }
+    }
+
+    return result;
+}
+
 void destroy_matrix(matrix_t *m)
 {
     free(m->array);
@@ -162,7 +183,9 @@ enum LineEnding processLine()
     matrix_t *matrix2 = create_matrix(dim, dim);
 
     readMatrix(matrix2, dim, &eol, &eof);
-    print_matrix(stdout, matrix2);
+
+    matrix_t *result = matrix_product(matrix1, matrix2);
+    print_matrix(stdout, result);
 
     free(matrix1);
     free(matrix2);
