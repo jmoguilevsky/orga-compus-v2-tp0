@@ -23,27 +23,42 @@ void push(char *buffer, char value, size_t *currLength, size_t *bufferSize) {
 
 /* ******* Matrix implementation ******* */
 
-typedef struct matrix
-{
+typedef struct matrix {
     size_t rows;
     size_t cols;
     double *array;
 } matrix_t;
 
 matrix_t* create_matrix(size_t rows, size_t cols) {
-    matrix_t *matrix = malloc(sizeof(matrix_t) + rows * cols * sizeof(double)); 
+    matrix_t *matrix = malloc(sizeof(matrix_t));
+    double *array    = malloc(sizeof(double) * cols * rows);
+    matrix->array    = array;
     matrix->cols     = cols;
     matrix->rows     = rows;
     return matrix;
 }
 
+int print_matrix(FILE* fp, matrix_t* m) {
+    int elementCount = m->rows * m->cols;
+    for (int i = 0; i < elementCount; i++) {
+        char* format = (i == elementCount - 1) ? "%f\n" : "%f ";
+        int res = fprintf(fp, format, m->array[i]);
+        if (res < 0) {
+            fprintf(stderr, "Error writing to file\n");
+            return res;
+        }
+    }
+    return elementCount;
+}
+
 void destroy_matrix(matrix_t* m) {
+    free(m->array);
     free(m);
 }
 
 /* ******* Value processing ******* */ 
 
-double getValue(bool *endOfInput) {
+int getValue(double *value_ptr, bool *eol, bool *eof) {
     char c;
     bool stop         = false;
     size_t length     = 0;
@@ -53,24 +68,70 @@ double getValue(bool *endOfInput) {
     while (!stop) {
         c = (char) getchar();
         if (c == ' ' || c == '\n' || c == EOF) {
-            *endOfInput = (c == EOF);
+            *eol = (c == '\n');
+            *eof = (c == EOF);
             stop = true;
         } else {
             push(buffer, c, &length, &bufferSize);
         }
     }
-    double value = atof(buffer);
+    if (length > 0) {
+        *value_ptr = atof(buffer);
+    }
     free(buffer);
-    printf("char at the end of this is %c \n", c);
-    return value;
+    return length;
+}
+
+int readMatrix(matrix_t *matrix,int dim, bool *eol, bool *eof) {
+    double value;
+    int res;
+
+    for (int i = 0; i < dim * dim; i++){
+        res = getValue(&value, eol, eof);
+        if (res == 0 && (*eol || *eof)) {
+            fprintf(stderr, "Invalid format, cannot read matrix\n");
+            return -1;
+        } else {
+            matrix->array[i] = value;
+        }
+    }
+
+    return 0;
+}
+
+int processLine(){
+    double value;
+    int res;
+    size_t dim;
+
+    bool eol = false;
+    bool eof = false;
+
+    res = getValue(&value, &eol, &eof);
+
+    if (res == 0 || eol || eof) {
+        fprintf(stderr, "Invalid format, cannot read matrices\n");
+        return -1;
+    } else {
+        dim = (size_t) value;
+    }
+
+    matrix_t *matrix1 = create_matrix(dim, dim);
+
+    readMatrix(matrix1, dim, &eol, &eof);
+    print_matrix(stdout, matrix1);
+
+    matrix_t *matrix2 = create_matrix(dim, dim);
+
+    readMatrix(matrix2, dim, &eol, &eof);
+    print_matrix(stdout, matrix2);
+
+    free(matrix1);
+    free(matrix2);
+
+    return 0;
 }
 
 int main () {
-    bool endOfInput = false;
-    while (!endOfInput) {
-        double value = getValue(&endOfInput);
-        printf("value is %d \n", endOfInput);
-        printf("value is %f \n", value);
-    }
-    return 0;
+    return processLine();
 }
