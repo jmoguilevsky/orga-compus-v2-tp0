@@ -1,0 +1,6 @@
+first matrix
+2 2 2 2 2 2 2 2 2
+second matrix
+2 2 2 2 2 2 2 2 2
+result matrix
+12 12 12 12 12 12 12 12 12

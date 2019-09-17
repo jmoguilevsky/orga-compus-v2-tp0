@@ -1,0 +1,12 @@
+first matrix
+1
+second matrix
+1
+result matrix
+1
+first matrix
+2 2 1 1
+second matrix
+1 1 2 2
+result matrix
+6 6 3 3

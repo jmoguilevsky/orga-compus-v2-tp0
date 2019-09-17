@@ -1,0 +1,10 @@
+Usage:
+	./output.c -h
+	./output.c -V
+	./output.c < in_file > out_file
+Options:
+	-V, --version	Program version.
+	-h, --help	Print help.
+Examples:
+	./output.c	tp0 < in.txt > out.txt
+	cat in.txt ./output.c | tp0 > out.txt
