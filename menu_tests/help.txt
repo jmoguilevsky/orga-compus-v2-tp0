@@ -1,0 +1,10 @@
+Usage:
+	./dynamic -h
+	./dynamic -V
+	./dynamic < in_file > out_file
+Options:
+	-V, --version	Program version.
+	-h, --help	Print help.
+Examples:
+	./dynamic	tp0 < in.txt > out.txt
+	cat in.txt ./dynamic | tp0 > out.txt
