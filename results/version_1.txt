@@ -1,1 +1,1 @@
-./output.c: Version 1.0.0
+./dynamic: Version 1.0.0

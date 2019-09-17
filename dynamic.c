@@ -205,15 +205,15 @@ enum LineEnding process_line()
         return EndOfLine;
     }
 
-    printf("first matrix\n");
-    print_matrix(stdout, matrix1);
+    // printf("first matrix\n");
+    // print_matrix(stdout, matrix1);
 
-    printf("second matrix\n");
-    print_matrix(stdout, matrix2);
+    // printf("second matrix\n");
+    // print_matrix(stdout, matrix2);
 
     matrix_t *result = matrix_multiply(matrix1, matrix2);
 
-    printf("result matrix\n");
+    // printf("result matrix\n");
     print_matrix(stdout, result);
 
     destroy_matrix(matrix1);
@@ -277,7 +277,7 @@ int argsHandler_parse_arguments(const int argc, char* const argv[]) {
 
     // extern int optind
     if (optind < argc) {
-        fprintf(stderr, "Opciones no reconocidas: ");
+        fprintf(stderr, "Unrecognized options: ");
         while (optind < argc) {
             fprintf(stderr, "%s ", argv[optind++]);
         }

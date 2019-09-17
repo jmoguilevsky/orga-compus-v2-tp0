@@ -7,10 +7,10 @@ mkdir results
 
 for f in $FILES
 do
-    cat tests/$f | ./output.c > results/$f
+    cat tests/$f | ./dynamic > results/$f
 done
 
-./output.c -h > results/help_menu_1.txt
-./output.c --help > results/help_menu_2.txt
-./output.c -V > results/version_1.txt
-./output.c --version > results/version_2.txt
+./dynamic -h > results/help_menu_1.txt
+./dynamic --help > results/help_menu_2.txt
+./dynamic -V > results/version_1.txt
+./dynamic --version > results/version_2.txt

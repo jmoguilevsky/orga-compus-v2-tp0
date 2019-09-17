@@ -1,6 +1,1 @@
-first matrix
-2
-second matrix
-2
-result matrix
 4
