@@ -11,5 +11,21 @@ do
     echo
 done
 
+
+echo "Running test for help menu"
+./dynamic -h > temp.txt
+./compare_files.sh temp.txt menu_tests/help.txt
+
+./dynamic --help > temp.txt
+./compare_files.sh temp.txt menu_tests/help.txt
+
+echo "Running test for version menu"
+./dynamic -V > temp.txt
+./compare_files.sh temp.txt menu_tests/version.txt
+
+./dynamic --version > temp.txt
+./compare_files.sh temp.txt menu_tests/version.txt
+
+
 rm temp.txt
 rm error_temp.txt
