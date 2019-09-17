@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 
-
+#define VERSION "1.0.0"
 #define INIT_SIZE 2
 
 /* ******* Buffer functions ******* */
@@ -246,7 +246,7 @@ static void print_help(const char* src) {
 }
 
 static void print_version(const char* src) {
-    printf("%s: Version 1.0.0\n", src);
+    printf("%s: Version %s\n", src, VERSION);
 }
 
 int argsHandler_parse_arguments(const int argc, char* const argv[]) {
