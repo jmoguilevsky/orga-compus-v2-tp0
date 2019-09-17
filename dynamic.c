@@ -82,7 +82,7 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
         }
     }
 
-    print_matrix(stdout, result);
+    // print_matrix(stdout, result);
 
     return result;
 }
