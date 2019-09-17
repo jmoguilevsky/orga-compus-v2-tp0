@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <getopt.h>
+
 
 #define INIT_SIZE 2
 
@@ -22,6 +24,11 @@ void push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
     buffer[*currLength] = value;
     *currLength = *currLength + 1;
 }
+
+typedef struct parsed_args {
+    char* _input_filename;	// privado
+    char* _output_filename;	// privado
+} parsed_args_t;
 
 /* ******* Matrix implementation ******* */
 
@@ -208,8 +215,75 @@ enum LineEnding processLine()
     return EndOfLine;
 }
 
-int main()
+static void print_usage(const char* src) {
+    printf("%s\n\t%s%s\n\t%s%s\n\t%s%s\n", "Usage:",
+           src, " -h",
+           src, " -V",
+           src, " < in_file > out_file");
+}
+
+static void print_options(const char* src) {
+    printf("%s\n%s\n%s\n%s\n%s%s\t%s\n%s%s%s\n",
+            "Options:",
+           "\t-V, --version\tVersión del programa.",
+           "\t-h, --help\tImprime ayuda.",
+           "Examples:",
+           "\t", src, "tp0 < in.txt > out.txt",
+           "\tcat in.txt ", src, " | tp0 > out.txt");
+}
+
+static void print_help(const char* src) {
+    print_usage(src);
+    print_options(src);
+}
+
+static void print_version(const char* src) {
+    printf("%s: Version 1.0.0\n", src);
+}
+
+int argsHandler_parse_arguments(const int argc, char* const argv[]) {
+    int arg;
+    int option_index = 0;
+    const char* short_opt = "hV";
+    static struct option long_options[] = {
+            {"help",    no_argument,       0, 'h'},
+            {"version", no_argument,       0, 'V'},
+            {0,         0,                 0,  0 }
+    };
+
+    while ((arg = getopt_long(argc, argv, short_opt, long_options, &option_index)) != -1) {
+        switch (arg) {
+            case 'h':
+                print_help(argv[0]);
+                exit(EXIT_SUCCESS);
+            case 'V':
+                print_version(argv[0]);
+                exit(EXIT_SUCCESS);
+            case '?':
+                exit(EXIT_FAILURE);
+                break;
+            default:
+                break;
+        }
+    }
+
+    // extern int optind
+    if (optind < argc) {
+        fprintf(stderr, "Opciones no reconocidas: ");
+        while (optind < argc) {
+            fprintf(stderr, "%s ", argv[optind++]);
+        }
+        fprintf(stderr, "\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int main(int argc, char* const argv[])
 {
+    argsHandler_parse_arguments(argc, argv);
+
     enum LineEnding result;
 
     do
