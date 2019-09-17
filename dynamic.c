@@ -76,6 +76,9 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
             result->array[result->cols * i + j] = acum;
         }
     }
+
+    print_matrix(stdout, result);
+
     return result;
 }
 
