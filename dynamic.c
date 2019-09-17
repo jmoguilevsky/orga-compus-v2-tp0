@@ -25,11 +25,6 @@ void push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
     *currLength = *currLength + 1;
 }
 
-typedef struct parsed_args {
-    char* _input_filename;	// privado
-    char* _output_filename;	// privado
-} parsed_args_t;
-
 /* ******* Matrix implementation ******* */
 
 typedef struct matrix
@@ -89,11 +84,6 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
             // printf("after multiplication result->array[result->cols * i + j]: %f\n", result->array[result->cols * i + j]);
         }
     }
-
-    // printf("print result, result cols: %zu, result rows: %zu\n", result->cols, result->rows);
-
-    print_matrix(stdout, result);
-
     return result;
 }
 
@@ -192,25 +182,46 @@ enum LineEnding processLine()
     }
 
     dim = (size_t)value;
+    int response;
 
     matrix_t *matrix1 = create_matrix(dim, dim);
+    response = readMatrix(matrix1, dim, &eol, &eof);
 
-    readMatrix(matrix1, dim, &eol, &eof);
+    if(response == -1) {
+        destroy_matrix(matrix1);
+        return EndOfFile;
+    }
+
+    matrix_t *matrix2 = create_matrix(dim, dim);
+    response = readMatrix(matrix2, dim, &eol, &eof);
+
+    if(response == -1) {
+        destroy_matrix(matrix1);
+        destroy_matrix(matrix2);
+        return EndOfFile;
+    }
+
+    res = getValue(&value, &eol, &eof);
+    if (res != 0 || (!eol || !eof))
+    {
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
+        return EndOfFile;
+    }
+
     printf("first matrix\n");
     print_matrix(stdout, matrix1);
 
-    matrix_t *matrix2 = create_matrix(dim, dim);
-
-    readMatrix(matrix2, dim, &eol, &eof);
     printf("second matrix\n");
     print_matrix(stdout, matrix2);
 
     matrix_t *result = matrix_multiply(matrix1, matrix2);
+
     printf("result matrix\n");
     print_matrix(stdout, result);
 
-    free(matrix1);
-    free(matrix2);
+    destroy_matrix(matrix1);
+    destroy_matrix(matrix2);
+    destroy_matrix(result);
 
     return EndOfLine;
 }
