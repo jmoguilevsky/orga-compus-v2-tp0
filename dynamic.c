@@ -6,7 +6,7 @@
 
 /* ******* Buffer functions ******* */
 
-char *initBuffer(size_t size)
+char *init_buffer(size_t size)
 {
     return malloc(size * sizeof(char));
 }
@@ -47,7 +47,7 @@ int print_matrix(FILE *fp, matrix_t *m)
     int elementCount = m->rows * m->cols;
     for (int i = 0; i < elementCount; i++)
     {
-        char *format = (i == elementCount - 1) ? "%f\n" : "%f ";
+        char *format = (i == elementCount - 1) ? "%.10g\n" : "%.10g ";
         int res = fprintf(fp, format, m->array[i]);
         if (res < 0)
         {
@@ -69,21 +69,11 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
             double acum = 0;
             for (int k = 0; k < matrix1->cols; k++)
             {
-                // printf("currently multplying, i: %d, j: %d, k: %d, acum: %f\n", i, j, k, acum);
-                // printf("matrix1->array[matrix1->cols * i + k]: %f\n", matrix1->array[matrix1->cols * i + k]);
-                // printf("matrix2->array[matrix2->cols * k + j]: %f\n", matrix2->array[matrix2->cols * k + j]);
                 acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
-                // printf("acum after multiplication: %f\n", acum);
             }
-
-            // printf("result->cols * i + j: %lu\n", result->cols * i + j);
-            // printf("result->array[result->cols * i + j]: %f\n", result->array[result->cols * i + j]);
             result->array[result->cols * i + j] = acum;
-            // printf("after multiplication result->array[result->cols * i + j]: %f\n", result->array[result->cols * i + j]);
         }
     }
-
-    // printf("print result, result cols: %zu, result rows: %zu\n", result->cols, result->rows);
 
     print_matrix(stdout, result);
 
@@ -98,13 +88,13 @@ void destroy_matrix(matrix_t *m)
 
 /* ******* Value processing ******* */
 
-int getValue(double *value_ptr, bool *eol, bool *eof)
+int get_value(double *value_ptr, bool *eol, bool *eof)
 {
     char c;
     bool stop = false;
     size_t length = 0;
     size_t bufferSize = INIT_SIZE;
-    char *buffer = initBuffer(bufferSize);
+    char *buffer = init_buffer(bufferSize);
 
     while (!stop)
     {
@@ -128,14 +118,14 @@ int getValue(double *value_ptr, bool *eol, bool *eof)
     return length;
 }
 
-int readMatrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
+int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
 {
     double value;
     int res;
 
     for (int i = 0; i < dim * dim; i++)
     {
-        res = getValue(&value, eol, eof);
+        res = get_value(&value, eol, eof);
         if (res == 0 && (*eol || *eof))
         {
             fprintf(stderr, "Invalid format, cannot read matrix\n");
@@ -157,7 +147,7 @@ enum LineEnding
     Error
 };
 
-enum LineEnding processLine()
+enum LineEnding process_line()
 {
     double value;
     int res;
@@ -166,7 +156,7 @@ enum LineEnding processLine()
     bool eol = false;
     bool eof = false;
 
-    res = getValue(&value, &eol, &eof);
+    res = get_value(&value, &eol, &eof);
 
     if (eof)
     {
@@ -188,22 +178,21 @@ enum LineEnding processLine()
 
     matrix_t *matrix1 = create_matrix(dim, dim);
 
-    readMatrix(matrix1, dim, &eol, &eof);
-    printf("first matrix\n");
-    print_matrix(stdout, matrix1);
+    read_matrix(matrix1, dim, &eol, &eof);
+    // print_matrix(stdout, matrix1);
 
     matrix_t *matrix2 = create_matrix(dim, dim);
 
-    readMatrix(matrix2, dim, &eol, &eof);
-    printf("second matrix\n");
-    print_matrix(stdout, matrix2);
+    read_matrix(matrix2, dim, &eol, &eof);
+    // print_matrix(stdout, matrix2);
 
     matrix_t *result = matrix_multiply(matrix1, matrix2);
-    printf("result matrix\n");
+
     print_matrix(stdout, result);
 
     free(matrix1);
     free(matrix2);
+    free(result);
 
     return EndOfLine;
 }
@@ -214,7 +203,7 @@ int main()
 
     do
     {
-        result = processLine();
+        result = process_line();
     } while (result == EndOfLine);
 
     if (result == Error)
