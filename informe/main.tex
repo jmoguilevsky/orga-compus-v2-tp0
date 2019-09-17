@@ -151,49 +151,30 @@ cc obj/dynamic.o -o dynamic
 	
 \end{lstlisting}
 
-\section{Casos de prueba}
+\section{Pruebas}
 
 \subsubsection{Ejecución}
 
-Para automatizar la ejecución de los casos de prueba generamos una serie de scripts de bash:
+Para la ejecución de las pruebas generamos un script llamado \lstinline{run_tests.sh} que se encarga de, para cada caso generado, ejecutar el programa y escribit el output en un archivo.
+Finalmente, se comparan los outputs contra archivos que contienen los resultados esperados, en la carpeta \lstinline{results/}.
+
+\subsection{Casos de prueba}
+
+Para probar nuestro programa generamos una serie de casos de prueba:
 
 \begin{itemize}
-  \item \lstinline{generate_output.sh:} Esta función escribe sobre un puntero pasado como argumento el valor de punto flotante obtenido, correspondiente a una 'palabra' leida por \lstinline{stdin}. 
-  Esta misma función se utiliza para leer el primer valor entero que indica el tamaño de la matriz cuadrada. Para esto luego se castea el valor obtenido al tipo \lstinline{size_t}.
+  \item \lstinline{big_matrix_ints.txt:} Matriz de 100x100 con valores enteros
+	\item \lstinline{big_matrix_doubles.txt:} Matriz de 100x100 con valores de punto flotante
+  \item \lstinline{exponential_doubles_matrix.txt:} Matriz pequeña con valores de punto flotante en notación exponencial. 
+  \item \lstinline{help_menu.txt:} Impresión de menu. 
+  \item \lstinline{exponential_doubles_matrix.txt:} Matriz pequeña con valores de punto flotante en notación exponencial. 
+  \item \lstinline{exponential_doubles_matrix.txt:} Matriz pequeña con valores de punto flotante en notación exponencial. 
+  \item \lstinline{exponential_doubles_matrix.txt:} Matriz pequeña con valores de punto flotante en notación exponencial. 
+  \item \lstinline{exponential_doubles_matrix.txt:} Matriz pequeña con valores de punto flotante en notación exponencial. 
   
-  Para controlar y validar el input, la función retorna la cantidad de caracteres que leyó para obtener el valor.
-	\item \lstinline{read_matrix:} Aquí se invoca las veces necesarias a la función \lstinline{get_value} para obtener los valores de cada matriz.
-  En caso de llegar a whitespaces o símbolos no esperados, imprime un error que advierte que el formato del input es inválido. Las matrices las almacena en un puntero a \lstinline{matrix_t}.
+  Impresión de menú de ayuda y detalle de las opciones de ejecución del programa.
 \end{itemize}
 
-Los casos de prueba elegidos se distribuyen en 3 grupos: DOS, UNIX y mixed. \\
-DOS y UNIX contienen los mismos casos, excepto que en DOS los casos tienen \textit{line endings}
-con \lstinline{`\r\n'} y en UNIX con \lstinline{`\n'}.
-
-En mixed se agrupan los casos neutros, que corresponden a pruebas con archivos vacíos o con ocurrencias
-de ambos tipos de \textit{line endings}.
-
-\subsubsection{Simple.txt}
-
-Simple.txt es la prueba básica para evaluar el correcto funcionamiento de los programas.
-Su contenido es simplemente el siguiente.
-
-\begin{lstlisting}
-  One line
-  two lines
-  three lines
-\end{lstlisting}
-
-Por ejemplo, la ejecución del archivo \lstinline{simple.txt} de la carpeta UNIX con el programa
-\lstinline{unix2dos} es la siguiente:
-
-\begin{lstlisting}
-$ ./unix2dos -i casos_prueba/UNIX/simple.txt | od -t c
-0000000   O   n   e       l   i   n   e  \r  \n   t   w   o       l   i
-0000020   n   e   s  \r  \n   t   h   r   e   e       l   i   n   e   s
-0000040  \r  \n
-0000042
-\end{lstlisting}
 Ejecución con valgrind:
 \begin{lstlisting}
 $ valgrind --leak-check=yes ./unix2dos -i casos_prueba/UNIX/simple.txt -o nuevoarchivo.txt
