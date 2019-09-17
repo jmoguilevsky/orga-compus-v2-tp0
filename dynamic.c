@@ -69,12 +69,23 @@ matrix_t *matrix_product(matrix_t *matrix1, matrix_t *matrix2)
             double acum = 0;
             for (int k = 0; k < matrix1->cols; k++)
             {
+                // printf("currently multplying, i: %d, j: %d, k: %d, acum: %f\n", i, j, k, acum);
+                // printf("matrix1->array[matrix1->cols * i + k]: %f\n", matrix1->array[matrix1->cols * i + k]);
+                // printf("matrix2->array[matrix2->cols * k + j]: %f\n", matrix2->array[matrix2->cols * k + j]);
                 acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
+                // printf("acum after multiplication: %f\n", acum);
             }
 
-            result->array[matrix2->cols + j] = acum;
+            // printf("result->cols * i + j: %lu\n", result->cols * i + j);
+            // printf("result->array[result->cols * i + j]: %f\n", result->array[result->cols * i + j]);
+            result->array[result->cols * i + j] = acum;
+            // printf("after multiplication result->array[result->cols * i + j]: %f\n", result->array[result->cols * i + j]);
         }
     }
+
+    // printf("print result, result cols: %zu, result rows: %zu\n", result->cols, result->rows);
+
+    print_matrix(stdout, result);
 
     return result;
 }
@@ -178,13 +189,17 @@ enum LineEnding processLine()
     matrix_t *matrix1 = create_matrix(dim, dim);
 
     readMatrix(matrix1, dim, &eol, &eof);
+    printf("first matrix\n");
     print_matrix(stdout, matrix1);
 
     matrix_t *matrix2 = create_matrix(dim, dim);
 
     readMatrix(matrix2, dim, &eol, &eof);
+    printf("second matrix\n");
+    print_matrix(stdout, matrix2);
 
     matrix_t *result = matrix_product(matrix1, matrix2);
+    printf("result matrix\n");
     print_matrix(stdout, result);
 
     free(matrix1);
