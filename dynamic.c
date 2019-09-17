@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 
-
+#define VERSION "1.0.0"
 #define INIT_SIZE 2
 
 /* ******* Buffer functions ******* */

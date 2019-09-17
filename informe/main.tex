@@ -11,10 +11,11 @@
 \lstset{
 language=C,
 tabsize=2,
-  basicstyle=\ttfamily,
+  basicstyle=\small\ttfamily,
   columns=fullflexible,
   frame=single,
-  breaklines=true
+  breaklines=true,
+  resetmargins=true
 }
 
 \title{
@@ -94,7 +95,7 @@ Esta parte cuenta con las siguientes funciones:
   Esta misma función se utiliza para leer el primer valor entero que indica el tamaño de la matriz cuadrada. Para esto luego se castea el valor obtenido al tipo \lstinline{size_t}.
   
   Para controlar y validar el input, la función retorna la cantidad de caracteres que leyó para obtener el valor.
-	\item \lstinline{read_matrix:} Esta función sencillamente invoca las veces necesarias a la función \lstinline{get_value} para obtener los valores de cada matriz.
+	\item \lstinline{read_matrix:} Aquí se invoca las veces necesarias a la función \lstinline{get_value} para obtener los valores de cada matriz.
   En caso de llegar a whitespaces o símbolos no esperados, imprime un error que advierte que el formato del input es inválido. Las matrices las almacena en un puntero a \lstinline{matrix_t}.
 
   \item \lstinline{process_line:} Como bien lo indica el nombre, esta función procesa una línea de standard input. Lee el primer valor para obtener la dimensión de las matrices. 
@@ -118,7 +119,7 @@ Esta sección escencialmente implementa las interfaces propuestas por el enuncia
 
 \subsubsection{Presentación}
 
-Esta sección sencillamente se encarga del grueso de las interacciones con el usuario del programa:
+Esta sección resuelve la mayor parte de las interacciones con el usuario del programa:
 
 \begin{enumerate}
 	\item \lstinline{argsHandler_parse_arguments:} Parseo de argumentos y ejecución de la rutina correspondiente.
@@ -132,26 +133,38 @@ Esta sección sencillamente se encarga del grueso de las interacciones con el us
 La función \lstinline{main} sencillamente invoca al parseo de argumentos para imprimir menús de ayuda u opciones según corresponda. 
 Sino invoca a la rutina que lee el input por \lstinline{stdin} y procesa las líneas.
 
+\subsection{Código}
+
+\lstinputlisting{../dynamic.c}
+
 \lstset{
   language=bash,
   basicstyle=\small\ttfamily
 }
 
 \subsection{Compilación del programa}
-Para compilar el programa sencillamente tenemos utilizar su makefile desde el directorio donde se descomprimió el entregable:
+Para compilar el programa se utiliza el makefile desde el directorio donde se descomprimió el entregable:
 \begin{lstlisting}
 $ gmake all
-cc -I. -c common.c -o obj/common.o -std=c99 -Wall -Werror -pedantic -pedantic-errors
-cc -I. -c dos2unix.c -o obj/dos2unix.o -std=c99 -Wall -Werror -pedantic -pedantic-errors
-cc -I. -c unix2dos.c -o obj/unix2dos.o -std=c99 -Wall -Werror -pedantic -pedantic-errors
-cc obj/common.o obj/unix2dos.o -o unix2dos
-cc obj/common.o obj/dos2unix.o -o dos2unix
+cc -I. -c dynamic.c -o obj/dynamic.o -std=c99 -Wall -Werror -pedantic -pedantic-errors
+cc obj/dynamic.o -o dynamic
 	
 \end{lstlisting}
 
 \section{Casos de prueba}
 
-\subsection{Casos elegidos}
+\subsubsection{Ejecución}
+
+Para automatizar la ejecución de los casos de prueba generamos una serie de scripts de bash:
+
+\begin{itemize}
+  \item \lstinline{generate_output.sh:} Esta función escribe sobre un puntero pasado como argumento el valor de punto flotante obtenido, correspondiente a una 'palabra' leida por \lstinline{stdin}. 
+  Esta misma función se utiliza para leer el primer valor entero que indica el tamaño de la matriz cuadrada. Para esto luego se castea el valor obtenido al tipo \lstinline{size_t}.
+  
+  Para controlar y validar el input, la función retorna la cantidad de caracteres que leyó para obtener el valor.
+	\item \lstinline{read_matrix:} Aquí se invoca las veces necesarias a la función \lstinline{get_value} para obtener los valores de cada matriz.
+  En caso de llegar a whitespaces o símbolos no esperados, imprime un error que advierte que el formato del input es inválido. Las matrices las almacena en un puntero a \lstinline{matrix_t}.
+\end{itemize}
 
 Los casos de prueba elegidos se distribuyen en 3 grupos: DOS, UNIX y mixed. \\
 DOS y UNIX contienen los mismos casos, excepto que en DOS los casos tienen \textit{line endings}
