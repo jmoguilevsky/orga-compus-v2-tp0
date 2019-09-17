@@ -82,7 +82,7 @@ La solución propuesta para este trabajo comprende una serie de funciones que pu
 
 \subsubsection{Buffering}
 
-Este fragmento de la solución contiene las funciones \lstinline{initBuffer} y \lstinline{push}. La primer función inicializa el buffer. 
+Este fragmento de la solución contiene las funciones \lstinline{init_buffer} y \lstinline{push}. La primer función inicializa el buffer. 
 La segunda, agrega caracteres a un buffer ingresado como arugmento, manejando dinámicamente la memoria alocada por el buffer on demand.
 
 \subsubsection{Procesamiento}
@@ -90,36 +90,47 @@ La segunda, agrega caracteres a un buffer ingresado como arugmento, manejando di
 Esta parte cuenta con las siguientes funciones: 
 
 \begin{itemize}
-  \item \lstinline{getValue:} Esta función escribe sobre un puntero pasado como argumento el valor de punto flotante obtenido, correspondiente a una 'palabra' leida por \lstinline{stdin}. 
-  Esta misma función se utiliza para leer el primer valor entero que indica el tamaño de la matriz cuadrada. Por ello luego se castea el valor obtenido a un entero.
-	\item \lstinline{tryOpenFile:} Encargada de abrir los streams de input y output, según los
-  argumentos con los que se invoque la función. Por default esta función utiliza \lstinline{stdin} 
-  y \lstinline{stdout} como input y output stream respectivamente.
+  \item \lstinline{get_value:} Esta función escribe sobre un puntero pasado como argumento el valor de punto flotante obtenido, correspondiente a una 'palabra' leida por \lstinline{stdin}. 
+  Esta misma función se utiliza para leer el primer valor entero que indica el tamaño de la matriz cuadrada. Para esto luego se castea el valor obtenido al tipo \lstinline{size_t}.
+  
+  Para controlar y validar el input, la función retorna la cantidad de caracteres que leyó para obtener el valor.
+	\item \lstinline{read_matrix:} Esta función sencillamente invoca las veces necesarias a la función \lstinline{get_value} para obtener los valores de cada matriz.
+  En caso de llegar a whitespaces o símbolos no esperados, imprime un error que advierte que el formato del input es inválido. Las matrices las almacena en un puntero a \lstinline{matrix_t}.
+
+  \item \lstinline{process_line:} Como bien lo indica el nombre, esta función procesa una línea de standard input. Lee el primer valor para obtener la dimensión de las matrices. 
+  Por cada matriz, invoca a la inicialización de las variables de tipo \lstinline{matrix_t}, y luego a la función \lstinline{read_matrix}.
+  
+  Por último llama a \lstinline{matrix_multiply} para multiplicar las matrices y almacenar el resultado en un nuevo puntero a \lstinline{matrix_t}, para luego imprimir esta última matriz.
 \end{itemize}
 
 
-\subsubsection{\lstinline{Unix2dos}}
+\subsubsection{Implementación de matrices}
 
-El cuerpo principal del programa \lstinline{unix2dos} consiste en los siguientes pasos.
+Esta sección escencialmente implementa las interfaces propuestas por el enunciado. En particular se destacan las siguiente implementaciones:
 
 \begin{enumerate}
-	\item Obtener los nombres de los archivos de entrada y salida a partir de los argumentos de la
-	ejecución, utilizando la función \lstinline{getFileName}.
-	\item Abrir los archivos de input y output especificados, o en su defecto, \lstinline{stdin} y \lstinline{stdout},
-	invocando a la función \lstinline{tryOpenFile}.
-	\item Recorrer el stream de entrada con un puntero escribiendo cada caracter en el output stream
-  correspondiente, a excepción de los caracteres \lstinline{`\n'}, los cuales serían escritos como
-  \lstinline{`\r\n'}.
+	\item \lstinline{create_matrix:} Esta función requiere alocar memoria para la estructura de \lstinline{matrix_t}, y luego para el array de valores una vez conocido el tamaño de la matriz cuadrada.
+  
+  Por ello esta función realiza 2 memory allocation. Finalmente se inicializan los atributos de la matriz correspondientemente.
+  
+  \item \lstinline{destroy_matrix:} Como complemento de \lstinline{create_matrix}, esta función debe liberar la memoria alocada tanto para el array de valores como para la estructura inicializada.
 \end{enumerate}
 
-El siguiente es el código correspondiente a \lstinline{unix2dos.c}.
+\subsubsection{Presentación}
 
-\subsubsection{\lstinline{Dos2unix}}
+Esta sección sencillamente se encarga del grueso de las interacciones con el usuario del programa:
 
-\lstinline{Dos2unix} tiene escencialmente el mismo comportamiento que \lstinline{unix2dos},
-excepto que al recorrer el stream de entrada, son las suceciones de caracteres \lstinline{`\r\n'}
-las que son escritas como el caracter \lstinline{`\n'}.
+\begin{enumerate}
+	\item \lstinline{argsHandler_parse_arguments:} Parseo de argumentos y ejecución de la rutina correspondiente.
+  \item \lstinline{print_help, print_usage, print_options:} 
+  
+  Impresión de menú de ayuda y detalle de las opciones de ejecución del programa.
+\end{enumerate}
 
+\subsubsection{Main function}
+
+La función \lstinline{main} sencillamente invoca al parseo de argumentos para imprimir menús de ayuda u opciones según corresponda. 
+Sino invoca a la rutina que lee el input por \lstinline{stdin} y procesa las líneas.
 
 \lstset{
   language=bash,

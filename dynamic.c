@@ -25,11 +25,6 @@ void push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
     *currLength = *currLength + 1;
 }
 
-typedef struct parsed_args {
-    char* _input_filename;	// privado
-    char* _output_filename;	// privado
-} parsed_args_t;
-
 /* ******* Matrix implementation ******* */
 
 typedef struct matrix
@@ -177,29 +172,53 @@ enum LineEnding process_line()
 
     if (res == 0)
     {
-        fprintf(stderr, "Invalid format, cannot read matrices\n");
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
         return Error;
     }
 
     dim = (size_t)value;
+    int response;
 
     matrix_t *matrix1 = create_matrix(dim, dim);
 
-    read_matrix(matrix1, dim, &eol, &eof);
-    // print_matrix(stdout, matrix1);
+    response = read_matrix(matrix1, dim, &eol, &eof);
+
+    if(response == -1) {
+        destroy_matrix(matrix1);
+        return EndOfLine;
+    }
 
     matrix_t *matrix2 = create_matrix(dim, dim);
+    response = read_matrix(matrix2, dim, &eol, &eof);
 
-    read_matrix(matrix2, dim, &eol, &eof);
-    // print_matrix(stdout, matrix2);
+    if(response == -1) {
+        destroy_matrix(matrix1);
+        destroy_matrix(matrix2);
+        return EndOfLine;
+    }
+
+    if (!eol && !eof)
+    {
+        destroy_matrix(matrix1);
+        destroy_matrix(matrix2);
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
+        return EndOfLine;
+    }
+
+    printf("first matrix\n");
+    print_matrix(stdout, matrix1);
+
+    printf("second matrix\n");
+    print_matrix(stdout, matrix2);
 
     matrix_t *result = matrix_multiply(matrix1, matrix2);
 
+    printf("result matrix\n");
     print_matrix(stdout, result);
 
-    free(matrix1);
-    free(matrix2);
-    free(result);
+    destroy_matrix(matrix1);
+    destroy_matrix(matrix2);
+    destroy_matrix(result);
 
     return EndOfLine;
 }
@@ -214,8 +233,8 @@ static void print_usage(const char* src) {
 static void print_options(const char* src) {
     printf("%s\n%s\n%s\n%s\n%s%s\t%s\n%s%s%s\n",
             "Options:",
-           "\t-V, --version\tVersión del programa.",
-           "\t-h, --help\tImprime ayuda.",
+           "\t-V, --version\tProgram version.",
+           "\t-h, --help\tPrint help.",
            "Examples:",
            "\t", src, "tp0 < in.txt > out.txt",
            "\tcat in.txt ", src, " | tp0 > out.txt");
