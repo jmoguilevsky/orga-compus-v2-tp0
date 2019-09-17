@@ -77,8 +77,6 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
         }
     }
 
-    // print_matrix(stdout, result);
-
     return result;
 }
 
@@ -183,7 +181,8 @@ enum LineEnding process_line()
 
     response = read_matrix(matrix1, dim, &eol, &eof);
 
-    if(response == -1) {
+    if (response == -1)
+    {
         destroy_matrix(matrix1);
         return EndOfLine;
     }
@@ -191,7 +190,8 @@ enum LineEnding process_line()
     matrix_t *matrix2 = create_matrix(dim, dim);
     response = read_matrix(matrix2, dim, &eol, &eof);
 
-    if(response == -1) {
+    if (response == -1)
+    {
         destroy_matrix(matrix1);
         destroy_matrix(matrix2);
         return EndOfLine;
@@ -201,19 +201,11 @@ enum LineEnding process_line()
     {
         destroy_matrix(matrix1);
         destroy_matrix(matrix2);
-        fprintf(stderr, "Invalid format, cannot read matrix\n");
         return EndOfLine;
     }
 
-    // printf("first matrix\n");
-    // print_matrix(stdout, matrix1);
-
-    // printf("second matrix\n");
-    // print_matrix(stdout, matrix2);
-
     matrix_t *result = matrix_multiply(matrix1, matrix2);
 
-    // printf("result matrix\n");
     print_matrix(stdout, result);
 
     destroy_matrix(matrix1);
@@ -223,16 +215,18 @@ enum LineEnding process_line()
     return EndOfLine;
 }
 
-static void print_usage(const char* src) {
+static void print_usage(const char *src)
+{
     printf("%s\n\t%s%s\n\t%s%s\n\t%s%s\n", "Usage:",
            src, " -h",
            src, " -V",
            src, " < in_file > out_file");
 }
 
-static void print_options(const char* src) {
+static void print_options(const char *src)
+{
     printf("%s\n%s\n%s\n%s\n%s%s\t%s\n%s%s%s\n",
-            "Options:",
+           "Options:",
            "\t-V, --version\tProgram version.",
            "\t-h, --help\tPrint help.",
            "Examples:",
@@ -240,45 +234,51 @@ static void print_options(const char* src) {
            "\tcat in.txt ", src, " | tp0 > out.txt");
 }
 
-static void print_help(const char* src) {
+static void print_help(const char *src)
+{
     print_usage(src);
     print_options(src);
 }
 
-static void print_version() {
+static void print_version()
+{
     printf("Version %s\n", VERSION);
 }
 
-int argsHandler_parse_arguments(const int argc, char* const argv[]) {
+int argsHandler_parse_arguments(const int argc, char *const argv[])
+{
     int arg;
     int option_index = 0;
-    const char* short_opt = "hV";
+    const char *short_opt = "hV";
     static struct option long_options[] = {
-            {"help",    no_argument,       0, 'h'},
-            {"version", no_argument,       0, 'V'},
-            {0,         0,                 0,  0 }
-    };
+        {"help", no_argument, 0, 'h'},
+        {"version", no_argument, 0, 'V'},
+        {0, 0, 0, 0}};
 
-    while ((arg = getopt_long(argc, argv, short_opt, long_options, &option_index)) != -1) {
-        switch (arg) {
-            case 'h':
-                print_help(argv[0]);
-                exit(EXIT_SUCCESS);
-            case 'V':
-                print_version();
-                exit(EXIT_SUCCESS);
-            case '?':
-                exit(EXIT_FAILURE);
-                break;
-            default:
-                break;
+    while ((arg = getopt_long(argc, argv, short_opt, long_options, &option_index)) != -1)
+    {
+        switch (arg)
+        {
+        case 'h':
+            print_help(argv[0]);
+            exit(EXIT_SUCCESS);
+        case 'V':
+            print_version();
+            exit(EXIT_SUCCESS);
+        case '?':
+            exit(EXIT_FAILURE);
+            break;
+        default:
+            break;
         }
     }
 
     // extern int optind
-    if (optind < argc) {
+    if (optind < argc)
+    {
         fprintf(stderr, "Unrecognized options: ");
-        while (optind < argc) {
+        while (optind < argc)
+        {
             fprintf(stderr, "%s ", argv[optind++]);
         }
         fprintf(stderr, "\n");
@@ -288,7 +288,7 @@ int argsHandler_parse_arguments(const int argc, char* const argv[]) {
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char* const argv[])
+int main(int argc, char *const argv[])
 {
     argsHandler_parse_arguments(argc, argv);
 
@@ -297,6 +297,7 @@ int main(int argc, char* const argv[])
     do
     {
         result = process_line();
+
     } while (result == EndOfLine);
 
     if (result == Error)

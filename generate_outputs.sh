@@ -7,7 +7,7 @@ mkdir results
 
 for f in $FILES
 do
-    cat tests/$f | ./dynamic > results/$f
+    cat tests/$f | ./dynamic >> results/$f 2>results/error_$f
 done
 
 ./dynamic -h > results/help_menu_1.txt
