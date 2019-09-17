@@ -58,7 +58,7 @@ int print_matrix(FILE *fp, matrix_t *m)
     return elementCount;
 }
 
-matrix_t *matrix_product(matrix_t *matrix1, matrix_t *matrix2)
+matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
 {
     matrix_t *result = create_matrix(matrix1->rows, matrix2->cols);
 
@@ -198,7 +198,7 @@ enum LineEnding processLine()
     printf("second matrix\n");
     print_matrix(stdout, matrix2);
 
-    matrix_t *result = matrix_product(matrix1, matrix2);
+    matrix_t *result = matrix_multiply(matrix1, matrix2);
     printf("result matrix\n");
     print_matrix(stdout, result);
 
