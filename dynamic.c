@@ -245,8 +245,8 @@ static void print_help(const char* src) {
     print_options(src);
 }
 
-static void print_version(const char* src) {
-    printf("%s: Version %s\n", src, VERSION);
+static void print_version() {
+    printf("Version %s\n", VERSION);
 }
 
 int argsHandler_parse_arguments(const int argc, char* const argv[]) {
@@ -265,7 +265,7 @@ int argsHandler_parse_arguments(const int argc, char* const argv[]) {
                 print_help(argv[0]);
                 exit(EXIT_SUCCESS);
             case 'V':
-                print_version(argv[0]);
+                print_version();
                 exit(EXIT_SUCCESS);
             case '?':
                 exit(EXIT_FAILURE);
