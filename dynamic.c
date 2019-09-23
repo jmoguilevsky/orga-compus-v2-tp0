@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 #include <getopt.h>
 
@@ -10,19 +11,25 @@
 
 char *init_buffer(size_t size)
 {
-    return malloc(size * sizeof(char));
+    return calloc(size, size * sizeof(char));
 }
 
-void push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
+char* push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
 {
-    if (*currLength + 1 > *bufferSize)
+    if (*currLength >= *bufferSize)
     {
+        char *res;
         *bufferSize = *bufferSize * 2;
-        buffer = realloc(buffer, *bufferSize * sizeof(char));
+        printf("about to realloc to size %lu \n", *bufferSize * sizeof(char));
+        res = realloc(buffer, *bufferSize * sizeof(char));
+        res[*currLength] = value;
+        res[*currLength + 1] = '\0';
+        *currLength = *currLength + 1;
+        return res;  
     }
-
     buffer[*currLength] = value;
     *currLength = *currLength + 1;
+    return buffer;
 }
 
 /* ******* Matrix implementation ******* */
@@ -107,22 +114,27 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
         }
         else
         {
-            push(buffer, c, &length, &bufferSize);
+            char* new_buffer = push(buffer, c, &length, &bufferSize);
+            buffer = new_buffer;
         }
     }
     if (length > 0)
     {
-        *value_ptr = atof(buffer);
+        // printf("buffer value is %s \n", buffer);
+        // char string_value[length];
+        // strncpy(string_value, buffer, length - 1);
+        // string_value[length] = '\0';
+        //*value_ptr = atof(buffer);
+        sscanf(buffer, "%lG", value_ptr);
     }
     free(buffer);
     return length;
 }
 
-int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
-{
-    double value;
+int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof) {
     int res;
-
+    double value;
+    
     for (int i = 0; i < dim * dim; i++)
     {
         res = get_value(&value, eol, eof);
