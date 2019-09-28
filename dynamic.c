@@ -18,13 +18,12 @@ char *push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
 {
     if (*currLength + 1 >= *bufferSize)
     {
-        char *res;
+        char *newBuff;
         *bufferSize = *bufferSize * 2;
-        res = realloc(buffer, *bufferSize * sizeof(char));
-        res[*currLength] = value;
-        res[*currLength + 1] = '\0';
+        newBuff = realloc(buffer, *bufferSize * sizeof(char));
+        newBuff[*currLength] = value;
         *currLength = *currLength + 1;
-        return res;
+        return newBuff;
     }
     buffer[*currLength] = value;
     *currLength = *currLength + 1;
@@ -119,12 +118,13 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
     }
     if (length > 0)
     {
-        // printf("buffer value is %s \n", buffer);
-        // char string_value[length];
-        // strncpy(string_value, buffer, length - 1);
-        // string_value[length] = '\0';
-        //*value_ptr = atof(buffer);
-        sscanf(buffer, "%lG", value_ptr);
+        buffer[length] = 0;
+        int res = sscanf(buffer, "%lG", value_ptr);
+
+        // Si no puede interpretar un double, da error.
+        if (res == 0) {
+            return -1;
+        }
     }
     free(buffer);
     return length;
@@ -139,7 +139,7 @@ int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
     {
         res = get_value(&value, eol, eof);
 
-        if (res == 0 && (*eol || *eof))
+        if (res < 0 || (res == 0 && (*eol || *eof)))
         {
             fprintf(stderr, "Invalid format, cannot read matrix\n");
             return -1;
@@ -181,7 +181,7 @@ enum LineEnding process_line()
         return EndOfLine;
     }
 
-    if (res == 0)
+    if (res <= 0)
     {
         fprintf(stderr, "Invalid format, cannot read matrix\n");
         return Error;
@@ -197,7 +197,7 @@ enum LineEnding process_line()
     if (response == -1)
     {
         destroy_matrix(matrix1);
-        return EndOfLine;
+        return Error;
     }
 
     matrix_t *matrix2 = create_matrix(dim, dim);
@@ -207,7 +207,7 @@ enum LineEnding process_line()
     {
         destroy_matrix(matrix1);
         destroy_matrix(matrix2);
-        return EndOfLine;
+        return Error;
     }
 
     if (!eol && !eof)
