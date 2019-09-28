@@ -16,17 +16,17 @@ char *init_buffer(size_t size)
 
 char *push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
 {
-    if (*currLength + 1 >= *bufferSize)
+    *currLength = *currLength + 1;
+
+    if (*currLength >= *bufferSize)
     {
         char *newBuff;
         *bufferSize = *bufferSize * 2;
         newBuff = realloc(buffer, *bufferSize * sizeof(char));
-        newBuff[*currLength] = value;
-        *currLength = *currLength + 1;
+        newBuff[*currLength - 1] = value;
         return newBuff;
     }
-    buffer[*currLength] = value;
-    *currLength = *currLength + 1;
+    buffer[*currLength - 1] = value;
     return buffer;
 }
 
