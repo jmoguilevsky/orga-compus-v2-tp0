@@ -14,7 +14,7 @@ char *init_buffer(size_t size)
     return calloc(size, size * sizeof(char));
 }
 
-char* push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
+char *push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
 {
     if (*currLength >= *bufferSize)
     {
@@ -25,7 +25,7 @@ char* push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
         res[*currLength] = value;
         res[*currLength + 1] = '\0';
         *currLength = *currLength + 1;
-        return res;  
+        return res;
     }
     buffer[*currLength] = value;
     *currLength = *currLength + 1;
@@ -114,7 +114,7 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
         }
         else
         {
-            char* new_buffer = push(buffer, c, &length, &bufferSize);
+            char *new_buffer = push(buffer, c, &length, &bufferSize);
             buffer = new_buffer;
         }
     }
@@ -131,13 +131,15 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
     return length;
 }
 
-int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof) {
+int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
+{
     int res;
     double value;
-    
+
     for (int i = 0; i < dim * dim; i++)
     {
         res = get_value(&value, eol, eof);
+
         if (res == 0 && (*eol || *eof))
         {
             fprintf(stderr, "Invalid format, cannot read matrix\n");
@@ -213,11 +215,13 @@ enum LineEnding process_line()
     {
         destroy_matrix(matrix1);
         destroy_matrix(matrix2);
-        return EndOfLine;
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
+        return Error;
     }
 
     matrix_t *result = matrix_multiply(matrix1, matrix2);
 
+    printf("%zu ", dim);
     print_matrix(stdout, result);
 
     destroy_matrix(matrix1);
@@ -309,8 +313,7 @@ int main(int argc, char *const argv[])
     do
     {
         result = process_line();
-
-    } while (result == EndOfLine);
+    } while (result == EndOfLine && result != Error);
 
     if (result == Error)
     {
