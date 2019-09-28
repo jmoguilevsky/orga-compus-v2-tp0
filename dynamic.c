@@ -16,11 +16,10 @@ char *init_buffer(size_t size)
 
 char *push(char *buffer, char value, size_t *currLength, size_t *bufferSize)
 {
-    if (*currLength >= *bufferSize)
+    if (*currLength + 1 >= *bufferSize)
     {
         char *res;
         *bufferSize = *bufferSize * 2;
-        printf("about to realloc to size %lu \n", *bufferSize * sizeof(char));
         res = realloc(buffer, *bufferSize * sizeof(char));
         res[*currLength] = value;
         res[*currLength + 1] = '\0';
