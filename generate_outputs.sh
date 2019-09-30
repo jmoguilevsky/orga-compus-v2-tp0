@@ -1,5 +1,3 @@
-#! /bin/bash
-
 FILES=$(ls tests)
 
 rm -rf results

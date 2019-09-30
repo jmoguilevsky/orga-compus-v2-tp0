@@ -52,7 +52,9 @@ matrix_t *create_matrix(size_t rows, size_t cols)
 int print_matrix(FILE *fp, matrix_t *m)
 {
     int elementCount = m->rows * m->cols;
-    for (int i = 0; i < elementCount; i++)
+
+    int i = 0;
+    for (i; i < elementCount; i++)
     {
         char *format = (i == elementCount - 1) ? "%.10g\n" : "%.10g ";
         int res = fprintf(fp, format, m->array[i]);
@@ -69,12 +71,15 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
 {
     matrix_t *result = create_matrix(matrix1->rows, matrix2->cols);
 
-    for (int i = 0; i < matrix1->rows; i++)
+    int i = 0;
+    for (i; i < matrix1->rows; i++)
     {
-        for (int j = 0; j < matrix2->cols; j++)
+        int j = 0;
+        for (j; j < matrix2->cols; j++)
         {
             double acum = 0;
-            for (int k = 0; k < matrix1->cols; k++)
+            int k = 0;
+            for (k; k < matrix1->cols; k++)
             {
                 acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
             }
@@ -135,7 +140,8 @@ int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
     int res;
     double value;
 
-    for (int i = 0; i < dim * dim; i++)
+    int i = 0;
+    for (i; i < dim * dim; i++)
     {
         res = get_value(&value, eol, eof);
 
