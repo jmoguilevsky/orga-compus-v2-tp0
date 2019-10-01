@@ -179,12 +179,14 @@ enum LineEnding process_line()
 
     if (eof)
     {
-        return EndOfFile;
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
+        return Error;
     }
 
     if (eol)
     {
-        return EndOfLine;
+        fprintf(stderr, "Invalid format, cannot read matrix\n");
+        return Error;
     }
 
     if (res <= 0)
