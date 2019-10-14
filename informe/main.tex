@@ -145,9 +145,10 @@ Sino invoca a la rutina que lee el input por \lstinline{stdin} y procesa las lí
 \subsection{Compilación del programa}
 Para compilar el programa se utiliza el makefile desde el directorio donde se descomprimió el entregable:
 \begin{lstlisting}
-$ gmake all
-cc -I. -c dynamic.c -o obj/dynamic.o -std=c99 -Wall -Werror -pedantic -pedantic-errors
-cc obj/dynamic.o -o dynamic
+$ make clean
+$ make all
+gcc -std=c99 -Wall -Werror -pedantic -pedantic-errors  -c dynamic.c
+gcc -o dynamic dynamic.o
 	
 \end{lstlisting}
 

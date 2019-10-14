@@ -54,7 +54,7 @@ int print_matrix(FILE *fp, matrix_t *m)
     int elementCount = m->rows * m->cols;
 
     int i = 0;
-    for (i; i < elementCount; i++)
+    for (; i < elementCount; i++)
     {
         char *format = (i == elementCount - 1) ? "%.10g\n" : "%.10g ";
         int res = fprintf(fp, format, m->array[i]);
@@ -72,14 +72,14 @@ matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
     matrix_t *result = create_matrix(matrix1->rows, matrix2->cols);
 
     int i = 0;
-    for (i; i < matrix1->rows; i++)
+    for (; i < matrix1->rows; i++)
     {
         int j = 0;
-        for (j; j < matrix2->cols; j++)
+        for (; j < matrix2->cols; j++)
         {
             double acum = 0;
             int k = 0;
-            for (k; k < matrix1->cols; k++)
+            for (; k < matrix1->cols; k++)
             {
                 acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
             }
@@ -135,13 +135,13 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
     return length;
 }
 
-int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
+int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof, bool eolExpected)
 {
     int res;
     double value;
 
     int i = 0;
-    for (i; i < dim * dim; i++)
+    for (; i < dim * dim; i++)
     {
         res = get_value(&value, eol, eof);
 
@@ -153,6 +153,11 @@ int read_matrix(matrix_t *matrix, int dim, bool *eol, bool *eof)
         else
         {
             matrix->array[i] = value;
+        }
+
+        if (i == (dim * dim - 1) && *eol && !eolExpected) {
+            fprintf(stderr, "Invalid format, cannot read matrix\n");
+            return -1;
         }
     }
 
@@ -179,8 +184,7 @@ enum LineEnding process_line()
 
     if (eof)
     {
-        fprintf(stderr, "Invalid format, cannot read matrix\n");
-        return Error;
+        return EndOfFile;
     }
 
     if (eol)
@@ -200,7 +204,7 @@ enum LineEnding process_line()
 
     matrix_t *matrix1 = create_matrix(dim, dim);
 
-    response = read_matrix(matrix1, dim, &eol, &eof);
+    response = read_matrix(matrix1, dim, &eol, &eof, false);
 
     if (response == -1)
     {
@@ -209,7 +213,7 @@ enum LineEnding process_line()
     }
 
     matrix_t *matrix2 = create_matrix(dim, dim);
-    response = read_matrix(matrix2, dim, &eol, &eof);
+    response = read_matrix(matrix2, dim, &eol, &eof, true);
 
     if (response == -1)
     {

@@ -548,6 +548,8 @@ read_matrix:
 	sw	$a1,68($fp)
 	sw	$a2,72($fp)
 	sw	$a3,76($fp)
+	lw	$v0,80($fp)
+	sb	$v0,24($fp)
 	sw	$zero,40($fp)
 $L55:
 	lw	$v1,68($fp)
@@ -565,10 +567,10 @@ $L58:
 	lw	$a2,76($fp)
 	la	$t9,get_value
 	jal	$ra,$t9
-	sw	$v0,24($fp)
-	lw	$v0,24($fp)
+	sw	$v0,28($fp)
+	lw	$v0,28($fp)
 	bltz	$v0,$L60
-	lw	$v0,24($fp)
+	lw	$v0,28($fp)
 	bne	$v0,$zero,$L59
 	lw	$v0,72($fp)
 	lbu	$v0,0($v0)
@@ -593,6 +595,26 @@ $L59:
 	addu	$v0,$v1,$v0
 	l.d	$f0,32($fp)
 	s.d	$f0,0($v0)
+	lw	$v1,68($fp)
+	lw	$v0,68($fp)
+	mult	$v1,$v0
+	mflo	$v0
+	addu	$v1,$v0,-1
+	lw	$v0,40($fp)
+	bne	$v0,$v1,$L57
+	lw	$v0,72($fp)
+	lbu	$v0,0($v0)
+	beq	$v0,$zero,$L57
+	lbu	$v0,24($fp)
+	bne	$v0,$zero,$L57
+	la	$a0,__sF+176
+	la	$a1,$LC4
+	la	$t9,fprintf
+	jal	$ra,$t9
+	li	$v0,-1			# 0xffffffffffffffff
+	sw	$v0,44($fp)
+	b	$L54
+$L57:
 	lw	$v0,40($fp)
 	addu	$v0,$v0,1
 	sw	$v0,40($fp)
@@ -621,142 +643,140 @@ $LC5:
 	.globl	process_line
 	.ent	process_line
 process_line:
-	.frame	$fp,104,$ra		# vars= 64, regs= 3/0, args= 16, extra= 8
+	.frame	$fp,112,$ra		# vars= 64, regs= 3/0, args= 24, extra= 8
 	.mask	0xd0000000,-8
 	.fmask	0x00000000,0
 	.set	noreorder
 	.cpload	$t9
 	.set	reorder
-	subu	$sp,$sp,104
-	.cprestore 16
-	sw	$ra,96($sp)
-	sw	$fp,92($sp)
-	sw	$gp,88($sp)
+	subu	$sp,$sp,112
+	.cprestore 24
+	sw	$ra,104($sp)
+	sw	$fp,100($sp)
+	sw	$gp,96($sp)
 	move	$fp,$sp
-	sb	$zero,40($fp)
-	sb	$zero,41($fp)
-	addu	$v0,$fp,40
-	addu	$v1,$fp,41
-	addu	$a0,$fp,24
+	sb	$zero,48($fp)
+	sb	$zero,49($fp)
+	addu	$v0,$fp,48
+	addu	$v1,$fp,49
+	addu	$a0,$fp,32
 	move	$a1,$v0
 	move	$a2,$v1
 	la	$t9,get_value
 	jal	$ra,$t9
-	sw	$v0,32($fp)
-	lbu	$v0,41($fp)
-	beq	$v0,$zero,$L63
-	la	$a0,__sF+176
-	la	$a1,$LC4
-	la	$t9,fprintf
-	jal	$ra,$t9
-	li	$v0,2			# 0x2
-	sw	$v0,60($fp)
-	b	$L62
-$L63:
-	lbu	$v0,40($fp)
+	sw	$v0,40($fp)
+	lbu	$v0,49($fp)
 	beq	$v0,$zero,$L64
+	li	$v0,1			# 0x1
+	sw	$v0,68($fp)
+	b	$L63
+$L64:
+	lbu	$v0,48($fp)
+	beq	$v0,$zero,$L65
 	la	$a0,__sF+176
 	la	$a1,$LC4
 	la	$t9,fprintf
 	jal	$ra,$t9
 	li	$v1,2			# 0x2
-	sw	$v1,60($fp)
-	b	$L62
-$L64:
-	lw	$v0,32($fp)
-	bgtz	$v0,$L65
+	sw	$v1,68($fp)
+	b	$L63
+$L65:
+	lw	$v0,40($fp)
+	bgtz	$v0,$L66
 	la	$a0,__sF+176
 	la	$a1,$LC4
 	la	$t9,fprintf
 	jal	$ra,$t9
 	li	$a0,2			# 0x2
-	sw	$a0,60($fp)
-	b	$L62
-$L65:
-	l.d	$f0,24($fp)
-	s.d	$f0,64($fp)
-	l.d	$f2,$LC5
-	s.d	$f2,80($fp)
-	l.d	$f4,64($fp)
-	l.d	$f0,80($fp)
-	c.le.d	$f0,$f4
-	bc1t	$L66
-	l.d	$f0,64($fp)
-	trunc.w.d $f0,$f0,$v0
-	s.s	$f0,72($fp)
-	b	$L67
+	sw	$a0,68($fp)
+	b	$L63
 $L66:
-	l.d	$f2,64($fp)
-	l.d	$f4,80($fp)
+	l.d	$f0,32($fp)
+	s.d	$f0,72($fp)
+	l.d	$f2,$LC5
+	s.d	$f2,88($fp)
+	l.d	$f4,72($fp)
+	l.d	$f0,88($fp)
+	c.le.d	$f0,$f4
+	bc1t	$L67
+	l.d	$f0,72($fp)
+	trunc.w.d $f0,$f0,$v0
+	s.s	$f0,80($fp)
+	b	$L68
+$L67:
+	l.d	$f2,72($fp)
+	l.d	$f4,88($fp)
 	sub.d	$f0,$f2,$f4
 	li	$v0,-2147483648			# 0xffffffff80000000
 	trunc.w.d $f2,$f0,$a0
-	s.s	$f2,72($fp)
-	lw	$v1,72($fp)
+	s.s	$f2,80($fp)
+	lw	$v1,80($fp)
 	or	$v1,$v1,$v0
-	sw	$v1,72($fp)
-$L67:
-	lw	$a0,72($fp)
-	sw	$a0,36($fp)
-	lw	$a0,36($fp)
-	lw	$a1,36($fp)
+	sw	$v1,80($fp)
+$L68:
+	lw	$a0,80($fp)
+	sw	$a0,44($fp)
+	lw	$a0,44($fp)
+	lw	$a1,44($fp)
 	la	$t9,create_matrix
 	jal	$ra,$t9
-	sw	$v0,48($fp)
-	addu	$v0,$fp,40
-	addu	$v1,$fp,41
-	lw	$a0,48($fp)
-	lw	$a1,36($fp)
+	sw	$v0,56($fp)
+	addu	$v0,$fp,48
+	addu	$v1,$fp,49
+	sw	$zero,16($sp)
+	lw	$a0,56($fp)
+	lw	$a1,44($fp)
 	move	$a2,$v0
 	move	$a3,$v1
 	la	$t9,read_matrix
 	jal	$ra,$t9
-	sw	$v0,44($fp)
-	lw	$v1,44($fp)
+	sw	$v0,52($fp)
+	lw	$v1,52($fp)
 	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L68
-	lw	$a0,48($fp)
+	bne	$v1,$v0,$L69
+	lw	$a0,56($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
 	li	$a1,2			# 0x2
-	sw	$a1,60($fp)
-	b	$L62
-$L68:
-	lw	$a0,36($fp)
-	lw	$a1,36($fp)
+	sw	$a1,68($fp)
+	b	$L63
+$L69:
+	lw	$a0,44($fp)
+	lw	$a1,44($fp)
 	la	$t9,create_matrix
 	jal	$ra,$t9
-	sw	$v0,52($fp)
-	addu	$v0,$fp,40
-	addu	$v1,$fp,41
-	lw	$a0,52($fp)
-	lw	$a1,36($fp)
-	move	$a2,$v0
-	move	$a3,$v1
+	sw	$v0,60($fp)
+	addu	$v1,$fp,48
+	addu	$a3,$fp,49
+	li	$v0,1			# 0x1
+	sw	$v0,16($sp)
+	lw	$a0,60($fp)
+	lw	$a1,44($fp)
+	move	$a2,$v1
 	la	$t9,read_matrix
 	jal	$ra,$t9
-	sw	$v0,44($fp)
-	lw	$v1,44($fp)
+	sw	$v0,52($fp)
+	lw	$v1,52($fp)
 	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L69
-	lw	$a0,48($fp)
+	bne	$v1,$v0,$L70
+	lw	$a0,56($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
-	lw	$a0,52($fp)
+	lw	$a0,60($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
 	li	$v0,2			# 0x2
-	sw	$v0,60($fp)
-	b	$L62
-$L69:
-	lbu	$v0,40($fp)
-	bne	$v0,$zero,$L70
-	lbu	$v0,41($fp)
-	bne	$v0,$zero,$L70
-	lw	$a0,48($fp)
+	sw	$v0,68($fp)
+	b	$L63
+$L70:
+	lbu	$v0,48($fp)
+	bne	$v0,$zero,$L71
+	lbu	$v0,49($fp)
+	bne	$v0,$zero,$L71
+	lw	$a0,56($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
-	lw	$a0,52($fp)
+	lw	$a0,60($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
 	la	$a0,__sF+176
@@ -764,38 +784,38 @@ $L69:
 	la	$t9,fprintf
 	jal	$ra,$t9
 	li	$v1,2			# 0x2
-	sw	$v1,60($fp)
-	b	$L62
-$L70:
-	lw	$a0,48($fp)
-	lw	$a1,52($fp)
+	sw	$v1,68($fp)
+	b	$L63
+$L71:
+	lw	$a0,56($fp)
+	lw	$a1,60($fp)
 	la	$t9,matrix_multiply
 	jal	$ra,$t9
-	sw	$v0,56($fp)
+	sw	$v0,64($fp)
 	la	$a0,$LC6
-	lw	$a1,36($fp)
+	lw	$a1,44($fp)
 	la	$t9,printf
 	jal	$ra,$t9
 	la	$a0,__sF+88
-	lw	$a1,56($fp)
+	lw	$a1,64($fp)
 	la	$t9,print_matrix
-	jal	$ra,$t9
-	lw	$a0,48($fp)
-	la	$t9,destroy_matrix
-	jal	$ra,$t9
-	lw	$a0,52($fp)
-	la	$t9,destroy_matrix
 	jal	$ra,$t9
 	lw	$a0,56($fp)
 	la	$t9,destroy_matrix
 	jal	$ra,$t9
-	sw	$zero,60($fp)
-$L62:
-	lw	$v0,60($fp)
+	lw	$a0,60($fp)
+	la	$t9,destroy_matrix
+	jal	$ra,$t9
+	lw	$a0,64($fp)
+	la	$t9,destroy_matrix
+	jal	$ra,$t9
+	sw	$zero,68($fp)
+$L63:
+	lw	$v0,68($fp)
 	move	$sp,$fp
-	lw	$ra,96($sp)
-	lw	$fp,92($sp)
-	addu	$sp,$sp,104
+	lw	$ra,104($sp)
+	lw	$fp,100($sp)
+	addu	$sp,$sp,112
 	j	$ra
 	.end	process_line
 	.size	process_line, .-process_line
@@ -1055,7 +1075,7 @@ argsHandler_parse_arguments:
 	sw	$zero,36($fp)
 	la	$v0,$LC23
 	sw	$v0,40($fp)
-$L76:
+$L77:
 	addu	$v0,$fp,36
 	sw	$v0,16($sp)
 	lw	$a0,64($fp)
@@ -1067,27 +1087,27 @@ $L76:
 	sw	$v0,32($fp)
 	lw	$v1,32($fp)
 	li	$v0,-1			# 0xffffffffffffffff
-	bne	$v1,$v0,$L78
-	b	$L77
-$L78:
+	bne	$v1,$v0,$L79
+	b	$L78
+$L79:
 	lw	$v0,32($fp)
 	sw	$v0,44($fp)
 	li	$v0,86			# 0x56
 	lw	$v1,44($fp)
-	beq	$v1,$v0,$L81
+	beq	$v1,$v0,$L82
 	lw	$v1,44($fp)
 	slt	$v0,$v1,87
-	beq	$v0,$zero,$L85
+	beq	$v0,$zero,$L86
 	li	$v0,63			# 0x3f
 	lw	$v1,44($fp)
-	beq	$v1,$v0,$L82
-	b	$L76
-$L85:
+	beq	$v1,$v0,$L83
+	b	$L77
+$L86:
 	li	$v0,104			# 0x68
 	lw	$v1,44($fp)
-	beq	$v1,$v0,$L80
-	b	$L76
-$L80:
+	beq	$v1,$v0,$L81
+	b	$L77
+$L81:
 	lw	$v0,68($fp)
 	lw	$a0,0($v0)
 	la	$t9,print_help
@@ -1095,32 +1115,32 @@ $L80:
 	move	$a0,$zero
 	la	$t9,exit
 	jal	$ra,$t9
-$L81:
+$L82:
 	la	$t9,print_version
 	jal	$ra,$t9
 	move	$a0,$zero
 	la	$t9,exit
 	jal	$ra,$t9
-$L82:
+$L83:
 	li	$a0,1			# 0x1
 	la	$t9,exit
 	jal	$ra,$t9
-$L77:
+$L78:
 	lw	$v0,optind
 	lw	$v1,64($fp)
 	slt	$v0,$v0,$v1
-	beq	$v0,$zero,$L86
+	beq	$v0,$zero,$L87
 	la	$a0,__sF+176
 	la	$a1,$LC26
 	la	$t9,fprintf
 	jal	$ra,$t9
-$L87:
+$L88:
 	lw	$v0,optind
 	lw	$v1,64($fp)
 	slt	$v0,$v0,$v1
-	bne	$v0,$zero,$L89
-	b	$L88
-$L89:
+	bne	$v0,$zero,$L90
+	b	$L89
+$L90:
 	la	$a1,optind
 	lw	$v1,0($a1)
 	move	$v0,$v1
@@ -1134,8 +1154,8 @@ $L89:
 	lw	$a2,0($v0)
 	la	$t9,fprintf
 	jal	$ra,$t9
-	b	$L87
-$L88:
+	b	$L88
+$L89:
 	la	$a0,__sF+176
 	la	$a1,$LC28
 	la	$t9,fprintf
@@ -1143,7 +1163,7 @@ $L88:
 	li	$a0,1			# 0x1
 	la	$t9,exit
 	jal	$ra,$t9
-$L86:
+$L87:
 	move	$v0,$zero
 	move	$sp,$fp
 	lw	$ra,56($sp)
@@ -1174,25 +1194,25 @@ main:
 	lw	$a1,52($fp)
 	la	$t9,argsHandler_parse_arguments
 	jal	$ra,$t9
-$L91:
+$L92:
 	la	$t9,process_line
 	jal	$ra,$t9
 	sw	$v0,24($fp)
 	lw	$v0,24($fp)
-	bne	$v0,$zero,$L92
+	bne	$v0,$zero,$L93
 	lw	$v1,24($fp)
 	li	$v0,2			# 0x2
-	bne	$v1,$v0,$L91
-$L92:
+	bne	$v1,$v0,$L92
+$L93:
 	lw	$v1,24($fp)
 	li	$v0,2			# 0x2
-	bne	$v1,$v0,$L96
+	bne	$v1,$v0,$L97
 	li	$v0,-1			# 0xffffffffffffffff
 	sw	$v0,28($fp)
-	b	$L90
-$L96:
+	b	$L91
+$L97:
 	sw	$zero,28($fp)
-$L90:
+$L91:
 	lw	$v0,28($fp)
 	move	$sp,$fp
 	lw	$ra,40($sp)
