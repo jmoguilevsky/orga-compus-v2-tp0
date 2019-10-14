@@ -1,8 +1,10 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-#define STACK_SIZE 32
-#define
+#define STACK_SIZE 54
+#define OFFSET_RA 48
+#define OFFSET_GP 44
+#define OFFSET_FP 40
 
 /*
    54+-------------+
@@ -35,13 +37,16 @@
      |             |
     0+-------------+
 */
+    .data
+double_zero:   .double 0.0
 
     .text
     .abicalls
     .align 2
-    .globl matrix_multiply
+    .globl matrix_multiply_2
+    .ent matrix_multiply_2
 
-matrix_multiply:
+matrix_multiply_2:
     .frame $fp, STACK_SIZE, ra
     .set    noreorder
     .cpload t9
@@ -54,17 +59,18 @@ matrix_multiply:
     sw ra, OFFSET_RA(sp)        #guardo ra en el stack, esto tal vez no sea necesario
 
     move $fp, sp
+
     sw a0, 54($fp)
     sw a1, 58($fp)
 
-    lw t0, 54(fp)       #matrix 1->t0
-    lw t1, 58(fp)       #matrix 2->t1
+    lw t0, 54($fp)       #matrix 1->t0
+    lw t1, 58($fp)       #matrix 2->t1
 
     lw t2, 0(t0)        #matrix_1->rows -> t2
     lw t3, 4(t1)        #matrix_2->cols -> t3
 
-    lw a0, t2
-    lw a1, t3
+    move a0, t2
+    move a1, t3
     jal create_matrix
 
     sw v0, 36($fp)   #result
@@ -86,8 +92,8 @@ second_for:
     lw t2, 4(t1)        #t2 = matrix2->cols
     bge t2, t0, first_for
 
-    li t0, 0
-    s.d t0, 28($fp)      #acum
+    l.d $f4, double_zero
+    s.d $f4, 28($fp)      #acum
 
     li t1, 0
     sw t1, 24($fp)      #k
@@ -108,7 +114,7 @@ third_for:
     #matrix->array[cols * i + k]
     addi t6, t3, 8
     addu t6, t6, t5
-    l.d $f0, 0(t6)
+    l.d $f4, 0(t6)
 
     lw t5, 4(t4)    #matrix2->cols
     mul t5, t5, t2  #cols * k
@@ -117,14 +123,14 @@ third_for:
     #matrix->array[cols * k + j]
     addi t6, t4, 8
     addu t6, t6, t5
-    l.d $f1, 0(t6)
+    l.d $f6, 0(t6)
 
-    mul.d $f0, $f0, $f1
+    mul.d $f4, $f4, $f6
 
-    l.d $f2, 28($fp)    #acum
+    l.d $f8, 28($fp)    #acum
 
-    add.d $f0, $f2, $f0 #acum + matrix2->array[cols * k + j] * matrix1->array[cols*i + k]
-    s.w $f0, 28($fp)
+    add.d $f4, $f8, $f4 #acum + matrix2->array[cols * k + j] * matrix1->array[cols*i + k]
+    s.d $f4, 28($fp)
 
     lw t0, 24($fp)
     addi t0, t0, 1 #k + 1
@@ -141,22 +147,25 @@ third_for:
     mul t1, t1, t2
     addu t1, t1, t3
 
-    addi t0, 8(t0)
-    addu t0, 0(t1) #result->array[cols * i + j]
-    l.d $f0, 28($fp)
-    s.w $f0, 0(t0)
-    ba second_for
+    #addi t0, 8(t0)
+    #addu t0, 0(t1) #result->array[cols * i + j]
+    l.d $f4, 28($fp)
+    s.d $f4, 0(t0)
+    b second_for
 
 fin:
+    lw v0, 36($fp)
     move sp, $fp
     lw ra, 48(sp)
     lw $fp, 40(sp)
     lw gp, 44(sp)
-    addu sp,sp, 48
+    addu sp,sp, STACK_SIZE
 
     jr  ra
 
-    .end matrix_multiply
+    .end matrix_multiply_2
+
+
 
 
 
