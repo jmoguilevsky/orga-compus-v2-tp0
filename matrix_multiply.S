@@ -1,13 +1,13 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-#define STACK_SIZE 54
+#define STACK_SIZE 56
 #define OFFSET_RA 48
 #define OFFSET_GP 44
 #define OFFSET_FP 40
 
 /*
-   54+-------------+
+   56+-------------+
      | ----------- |
    52+-------------*
      |     ra      |
@@ -37,12 +37,14 @@
      |             |
     0+-------------+
 */
-    .data
-double_zero:   .double 0.0
+
+.data
+    double_zero:   .double 0.0
 
     .text
     .abicalls
     .align 2
+
     .globl matrix_multiply_2
     .ent matrix_multiply_2
 
@@ -60,11 +62,11 @@ matrix_multiply_2:
 
     move $fp, sp
 
-    sw a0, 54($fp)
-    sw a1, 58($fp)
+    sw a0, 56($fp)
+    sw a1, 60($fp)
 
-    lw t0, 54($fp)       #matrix 1->t0
-    lw t1, 58($fp)       #matrix 2->t1
+    lw t0, 56($fp)       #matrix 1->t0
+    lw t1, 60($fp)       #matrix 2->t1
 
     lw t2, 0(t0)        #matrix_1->rows -> t2
     lw t3, 4(t1)        #matrix_2->cols -> t3
@@ -76,10 +78,9 @@ matrix_multiply_2:
     sw v0, 36($fp)   #result
     sw t0, 16($fp)   #i
 
-
 first_for:
     lw t0, 16($fp)      #t0 = i
-    lw t1, 54($fp)
+    lw t1, 56($fp)
     lw t2, 0(t1)        #t2 = matrix1->rows, es neceisario esto???
     bge t2, t0, fin
 
@@ -88,7 +89,7 @@ first_for:
 
 second_for:
     lw t0, 20($fp)      #t0 = j
-    lw t1, 58($fp)
+    lw t1, 60($fp)
     lw t2, 4(t1)        #t2 = matrix2->cols
     bge t2, t0, first_for
 
@@ -104,8 +105,8 @@ third_for:
     lw t2, 24($fp)  #k
 
 
-    lw t3, 54($fp)  #matrix1
-    lw t4, 58($fp)  #matrix2
+    lw t3, 56($fp)  #matrix1
+    lw t4, 60($fp)  #matrix2
 
     lw t5, 4(t3)    #matrix1->cols
     mul t5, t5, t0  #matrix1->cols * i
@@ -155,27 +156,12 @@ third_for:
 
 fin:
     lw v0, 36($fp)
-    move sp, $fp
-    lw ra, 48(sp)
-    lw $fp, 40(sp)
-    lw gp, 44(sp)
+    lw gp, OFFSET_GP(sp)
+    lw $fp, OFFSET_FP(sp)
+    lw ra, OFFSET_RA(sp)
+
     addu sp,sp, STACK_SIZE
 
     jr  ra
 
     .end matrix_multiply_2
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
