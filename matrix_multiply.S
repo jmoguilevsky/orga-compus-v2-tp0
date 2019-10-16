@@ -76,6 +76,9 @@ matrix_multiply_2:
 
     move t0, zero
     sw t0, 16($fp)   #i
+    # la a0, 2 # load desired value into argument register $a0, using pseudo-op
+    # li v0, 1           # service 1 is print integer
+    # syscall
 
 
 first_for:
@@ -139,6 +142,7 @@ third_for:
     add t7, t7, t7
     add t7, t7, t7
     addu t7, t7, t6
+
     l.d $f6, 0(t7)
 
     mul.d $f4, $f4, $f6
@@ -173,6 +177,7 @@ end_third_for:
     addu t1, t1, t0
     lw t5, 0(t1)  #result->array[cols * i + j] = acum
 
+    s.d $f4, 0(t5) #result->array[cols * i + j] = acum
     s.d $f4, 0(t1)
 
     #j++
@@ -187,17 +192,9 @@ end_second_for:
     lw t0, 16($fp)
     addi t0, t0, 1
     sw t0, 16($fp)
-    b fin
     b first_for
 
 fin:
-    #lw t0, 56($fp)
-    #lw t0, 8(t0)
-
-    #l.d $f2, double_zero
-    #s.d $f2, 0(t0)
-
-
     lw v0, 36($fp)
     lw gp, OFFSET_GP(sp)
     lw $fp, OFFSET_FP(sp)

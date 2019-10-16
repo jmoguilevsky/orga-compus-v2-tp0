@@ -8,7 +8,6 @@
 #define VERSION "1.0.0"
 #define INIT_SIZE 2
 
-
 /* ******* Buffer functions ******* */
 
 char *init_buffer(size_t size)
@@ -131,7 +130,8 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
         int res = sscanf(buffer, "%lG", value_ptr);
 
         // Si no puede interpretar un double, da error.
-        if (res == 0) {
+        if (res == 0)
+        {
             return -1;
         }
     }
@@ -230,11 +230,11 @@ enum LineEnding process_line()
         return Error;
     }
 
-    printf("llegue hasta aca");
+    fprintf(stderr, "llegue hasta aca\n");
     matrix_t *result = matrix_multiply_2(matrix1, matrix2);
-    printf("llegue hasta aca 2");
+    fprintf(stderr, "llegue hasta aca 2\n");
 
-    printf("%zu ", dim);
+    printf("%zu \n", dim);
     print_matrix(stdout, result);
 
     destroy_matrix(matrix1);
@@ -280,25 +280,25 @@ int argsHandler_parse_arguments(const int argc, char *const argv[])
     int option_index = 0;
     const char *short_opt = "hV";
     static struct option long_options[] = {
-            {"help", no_argument, 0, 'h'},
-            {"version", no_argument, 0, 'V'},
-            {0, 0, 0, 0}};
+        {"help", no_argument, 0, 'h'},
+        {"version", no_argument, 0, 'V'},
+        {0, 0, 0, 0}};
 
     while ((arg = getopt_long(argc, argv, short_opt, long_options, &option_index)) != -1)
     {
         switch (arg)
         {
-            case 'h':
-                print_help(argv[0]);
-                exit(EXIT_SUCCESS);
-            case 'V':
-                print_version();
-                exit(EXIT_SUCCESS);
-            case '?':
-                exit(EXIT_FAILURE);
-                break;
-            default:
-                break;
+        case 'h':
+            print_help(argv[0]);
+            exit(EXIT_SUCCESS);
+        case 'V':
+            print_version();
+            exit(EXIT_SUCCESS);
+        case '?':
+            exit(EXIT_FAILURE);
+            break;
+        default:
+            break;
         }
     }
 
