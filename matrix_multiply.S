@@ -38,10 +38,6 @@
     0+-------------+
 */
 
-.data
-    .align 2
-    double_zero:   .double 0.0
-
     .text
     .abicalls
     .align 2
@@ -125,10 +121,12 @@ third_for:
     addu t5, t5, t2 #matrix1->cols * i + k
 
     #matrix->array[cols * i + k]
-    la t6, 8(t3)
+    lw t6, 8(t3)
     add t7, t5, t5
     add t7, t7, t7
+    add t7, t7, t7
     addu t7, t7, t6
+
     l.d $f4, 0(t7)
 
     lw t5, 4(t4)    #matrix2->cols
@@ -136,8 +134,9 @@ third_for:
     addu t5, t5, t1 #cols * k + j
 
     #matrix->array[cols * k + j]
-    la t6, 8(t4)
+    lw t6, 8(t4)
     add t7, t5, t5
+    add t7, t7, t7
     add t7, t7, t7
     addu t7, t7, t6
     l.d $f6, 0(t7)
@@ -147,6 +146,7 @@ third_for:
     l.d $f8, 28($fp)    #load acum
 
     add.d $f4, $f8, $f4 #acum + matrix2->array[cols * k + j] * matrix1->array[cols*i + k]
+
     s.d $f4, 28($fp)
 
     #k++
@@ -156,23 +156,24 @@ third_for:
     b third_for
 
 end_third_for:
-    lw t8, 36($fp)  #result
-    lw t1, 4(t8)    #result->cols
+    lw t0, 36($fp)  #result
+    lw t1, 4(t0)    #result->cols
     lw t2, 16($fp)  #i
     lw t3, 20($fp)  #j
 
     mul t1, t1, t2
     addu t1, t1, t3 #t1 = cols * i + j
 
-    l.d $f4, 28($fp) #$f4 = acum
+    l.d $f4, 28($fp)    #$f4 = acum
 
-    la t4, 8(t8)
+    lw t0, 8(t0)
     add t1, t1, t1
     add t1, t1, t1
-    addu t1, t1, t4
-    la t5, 0(t1)  #result->array[cols * i + j] = acum
+    add t1, t1, t1
+    addu t1, t1, t0
+    lw t5, 0(t1)  #result->array[cols * i + j] = acum
 
-    s.d $f4, 0(t5)
+    s.d $f4, 0(t1)
 
     #j++
     lw t0, 20($fp)
@@ -186,9 +187,17 @@ end_second_for:
     lw t0, 16($fp)
     addi t0, t0, 1
     sw t0, 16($fp)
+    b fin
     b first_for
 
 fin:
+    #lw t0, 56($fp)
+    #lw t0, 8(t0)
+
+    #l.d $f2, double_zero
+    #s.d $f2, 0(t0)
+
+
     lw v0, 36($fp)
     lw gp, OFFSET_GP(sp)
     lw $fp, OFFSET_FP(sp)
@@ -199,3 +208,6 @@ fin:
     jr  ra
 
     .end matrix_multiply_2
+
+.data
+    double_zero: .double 0.0
