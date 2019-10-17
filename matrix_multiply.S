@@ -8,7 +8,7 @@
 
 /*
    56+-------------+
-     | ----------- |
+     |   padding   |
    52+-------------*
      |     ra      |
    48+-------------+
@@ -74,22 +74,20 @@ matrix_multiply_2:
 
     sw v0, 36($fp)   #result
 
-    move t0, zero
-    sw t0, 16($fp)   #i
-    # la a0, 2 # load desired value into argument register $a0, using pseudo-op
-    # li v0, 1           # service 1 is print integer
-    # syscall
+    li t0, 0
+    sw t0, 16($fp)   #inicializo i
 
 
 first_for:
     lw t0, 16($fp)      #t0 = i
-    lw t1, 56($fp)      #matrix1
-    lw t2, 0(t1)        #t2 = matrix1->rows, es neceisario esto???
+    lw t1, 56($fp)      #t1 = matrix1
+    lw t2, 0(t1)        #t2 = matrix1->rows
 
-    slt t3, t0, t2      #i < rows?
-    beq t3, zero, fin
+    #condicion del if, para saber si i < rows
+    slt t3, t0, t2
+    beq t3, zero, end
 
-    li t1, 0            #j
+    li t1, 0            #inicializo j
     sw t1, 20($fp)
 
 second_for:
@@ -97,6 +95,7 @@ second_for:
     lw t1, 60($fp)      #matrix2
     lw t2, 4(t1)        #t2 = matrix2->cols
 
+    #pregunto si j < cols
     slt t3, t0, t2
     beq t3, zero, end_second_for
 
@@ -104,12 +103,12 @@ second_for:
     s.d $f4, 28($fp)      #acum=0.0
 
     li t1, 0
-    sw t1, 24($fp)      #k=0
+    sw t1, 24($fp)      #inicializo k
 
 third_for:
-    lw t0, 16($fp)  #i
-    lw t1, 20($fp)  #j
-    lw t2, 24($fp)  #k
+    lw t0, 16($fp)  #t0 = i
+    lw t1, 20($fp)  #t1 = j
+    lw t2, 24($fp)  #t2 = k
 
     lw t3, 56($fp)  #matrix1
     lw t4, 60($fp)  #matrix2
@@ -138,12 +137,10 @@ third_for:
 
     #matrix->array[cols * k + j]
     lw t6, 8(t4)
-    add t7, t5, t5
-    add t7, t7, t7
-    add t7, t7, t7
-    addu t7, t7, t6
+    sll t5, t5, 3
+    addu t5, t5, t6
 
-    l.d $f6, 0(t7)
+    l.d $f6, 0(t5)
 
     mul.d $f4, $f4, $f6
 
@@ -175,9 +172,9 @@ end_third_for:
     add t1, t1, t1
     add t1, t1, t1
     addu t1, t1, t0
-    lw t5, 0(t1)  #result->array[cols * i + j] = acum
+    #lw t5, 0(t1)  #result->array[cols * i + j] = acum
 
-    s.d $f4, 0(t5) #result->array[cols * i + j] = acum
+    #s.d $f4, 0(t5) #result->array[cols * i + j] = acum
     s.d $f4, 0(t1)
 
     #j++
@@ -194,7 +191,7 @@ end_second_for:
     sw t0, 16($fp)
     b first_for
 
-fin:
+end:
     lw v0, 36($fp)
     lw gp, OFFSET_GP(sp)
     lw $fp, OFFSET_FP(sp)
