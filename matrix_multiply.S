@@ -28,13 +28,13 @@
    20+-------------+
      |      i      |
    16+-------------+
-     |             |
+     |     a3      |
    12+-------------+
-     |             |
+     |     a2      |
     8+-------------+
-     |             |
+     |     a1      |
     4+-------------+
-     |             |
+     |     a0      |
     0+-------------+
 */
 
@@ -70,7 +70,7 @@ matrix_multiply_2:
 
     move a0, t2
     move a1, t3
-    jal create_matrix
+    jal create_matrix_S
 
     sw v0, 36($fp)   #result
 
@@ -202,6 +202,108 @@ end:
     jr  ra
 
     .end matrix_multiply_2
+
+  .globl create_matrix_S
+  .ent create_matrix_S
+
+
+#define STACK_SIZE_CREATE_MATRIX 40
+#define OFFSET_RA_CREATE_MATRIX 32
+#define OFFSET_GP_CREATE_MATRIX 28
+#define OFFSET_FP_CREATE_MATRIX 24
+#define OFFSET_MY_MATRIX_CREATE_MATRIX 16
+#define A0_CALLEE_CREATE_MATRIX 0
+#define A0_CALLER_CREATE_MATRIX 40
+#define A1_CALLER_CREATE_MATRIX 44
+
+/*
+   48+-------------+
+     |     a1      |
+   44+-------------+
+     |     a0      |
+   40+-------------+
+     |   padding   |
+   36+-------------+
+     |     ra      |
+   32+-------------+ 
+     |     gp      |
+   28+-------------*
+     |     fp      |
+   24+-------------+
+     |   padding   |
+   20+-------------+
+     |  my_matrix  |
+   16+-------------+
+     |     a3      |
+   12+-------------+
+     |     a2      |
+    8+-------------+
+     |     a1      |
+    4+-------------+
+     |     a0      |
+    0+-------------+
+*/
+create_matrix_S:
+  .frame $fp, STACK_SIZE_CREATE_MATRIX, ra
+  .set    noreorder
+  .cpload t9
+  .set    reorder
+
+  subu sp, sp, STACK_SIZE_CREATE_MATRIX     #construccion stack
+
+  .cprestore OFFSET_GP_CREATE_MATRIX        #guardo gp en el stack
+  sw $fp, OFFSET_FP_CREATE_MATRIX(sp)       #guardo fp en el stack
+  sw ra, OFFSET_RA_CREATE_MATRIX(sp)        #guardo ra en el stack, esto tal vez no sea necesario
+
+  move $fp, sp
+
+  sw a0, A0_CALLER_CREATE_MATRIX($fp)
+  sw a1, A1_CALLER_CREATE_MATRIX($fp)
+
+
+  li t0, 12 # sizeof(matrix_t)
+  move a0, t0
+
+  jal mymalloc #v0 = mymalloc(sizeof(matrix_t));
+
+  sw v0, OFFSET_MY_MATRIX_CREATE_MATRIX($fp)
+
+
+  lw t0, A0_CALLER_CREATE_MATRIX($fp) # t0 = rows
+  lw t1, A1_CALLER_CREATE_MATRIX($fp) # t1 = cols
+  mul t2, t0, t1 # t2 = rows * cols
+  li t3, 8 # sizeof(double)
+  mul t2, t2, t3 # t2 = sizeof(double) * cols * rows
+  
+  move a0, t2
+
+  jal mymalloc #v0 = mymalloc(sizeof(double) * cols * rows); (el array)
+
+  lw t0, OFFSET_MY_MATRIX_CREATE_MATRIX($fp) # t0 = puntero a la matriz creada
+  sw v0, 8(t0)
+
+  move v0, t0
+
+  lw t0, A0_CALLER_CREATE_MATRIX($fp)
+  lw t1, A1_CALLER_CREATE_MATRIX($fp)
+
+  move a0, t0
+  move a1, t1
+
+  lw t0, A0_CALLER_CREATE_MATRIX($fp) # t0 = rows
+  sw t0, 0(v0)
+
+  lw t1, A1_CALLER_CREATE_MATRIX($fp) # t1 = cols
+  sw t1, 4(v0)
+  
+  lw gp, OFFSET_GP_CREATE_MATRIX(sp)
+  lw $fp, OFFSET_FP_CREATE_MATRIX(sp)
+  lw ra, OFFSET_RA_CREATE_MATRIX(sp)
+
+  addu sp,sp, STACK_SIZE_CREATE_MATRIX
+
+  jr  ra
+  .end create_matrix_S
 
 .data
     double_zero: .double 0.0
