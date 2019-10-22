@@ -47,7 +47,7 @@ tabsize=2,
 
 
 \begin{abstract}
-Este trabajo práctico grupal tiene como objetivo principal.
+Este trabajo práctico grupal tiene como objetivo poner en práctica los conocimientos adquiridos sobre la arquitectura MIPS y la programación en assmebly en este entorno. Asimismo, se ponen en práctica la convenciones de código dispuestas por la MIPS ABI.
 \end{abstract}
 
 \pagebreak
@@ -70,14 +70,28 @@ Este trabajo práctico grupal tiene como objetivo principal.
 \section{Solución}
 
 \subsection{Diseño}
-Se conservaron del código escrito para el anterior trabajo práctico las funciones dedicadas a procesamiento que se dedica a la lectura y procesamiento de las matrices ingresadas para su utilización, desde leer el input ingresado hasta formatearlo como es necesario, y la presentación impresión de menús y mensajes de error respectivamente.
+Algunos fragmentos del código entregado en el trabajo práctico anterior se mantienen sin modificaciones:
+\begin{itemize}
+  \item Se conserva el código escrito para las funciones de lectura y procesamiento del input para generar las matrices de entrada, y para imprimir los resultados de la multiplicación.
+  \item También se mantiene sin cambios la presentación de menus y mensajes de error.
+\end{itemize}
 
-Por otra parte, se implementaron en lenguaje assembly de MIPS las funciones \textbf{matrix\_multiply} y \textbf{create\_matrix}
+A fines de reservar y liberar memoria alocada para matrices en forma compatible con el código assembly, las funciones \textbf{create\_matrix} y \textbf{destroy\_matrix} de C ahora utilizan las rutinas \textbf{my\_malloc} y \textbf{my\_free} definidas en el archivo \textbf{my\_malloc.S}. 
+
+Por otra parte, se implementaron en lenguaje assembly de MIPS las funciones \textbf{matrix\_multiply} y \textbf{create\_matrix\_S}
+
+Si bien se mantiene una versión del código C de \textbf{create\_matrix}, la nueva versión en assembly es empleada internamente dentro de la función \textbf{matrix\_multiply} para generar la matriz resultado.
 
 \subsubsection{matrix\_multiply}
-Función encargada del cálculo del producto de las matrices ingresadas. \\
-    \lstinline{Stack frame} \\
-            \includegraphics[max height=100pt,max width=100pt]{./stack_matrix_multiply.png}
+
+Esta función se encarga del cálculo del producto de las matrices ingresadas. Fue implementada siguiendo el mismo procedimiento que la versión previa escrita en lenguaje C. 
+
+La principal diferencia con el código C anterior es que internamente esta función llama a la implementación de \textbf{create\_matrix\_S} escrita en assembly.\\
+
+\lstinline{Stack frame} \\
+            \begin{center}
+              \includegraphics[max height=100pt,max width=100pt]{./stack_matrix_multiply.png}
+            \end{center}
             \begin{itemize}
                 \item \lstinline{SRA}
                 Se guardaron los registros gp, fp y ra en este área, con 4 bytes de padding para que quede alineada a 8 bytes como dicta la ABI
@@ -87,10 +101,16 @@ Función encargada del cálculo del producto de las matrices ingresadas. \\
 
            Además, se definieron las constantes STACK\_SIZE(tamaño del stack), OFFSET\_RA, OFFSET\_FP y OFFSET\_GP para los offsets de las posiciones de memoria donde se guardaran los registros ra, fp y gp respectivamente
 
-\subsubsection{create\_matrix}
-    Función encargada de reservar memoria para una matriz con las dimensiones recibidas por parametro \\
+\subsubsection{create\_matrix\_S}
+    Función encargada de reservar memoria para una matriz con las dimensiones recibidas por parametro.
+    
+    Esta función se encarga de alocar la memoria para la estructura que almacena la matriz resultado. Por ello internamente utiliza una rutina que reserva memoria en heap, llamada \textbf{my\_malloc}, en el archivo \textbf{my\_malloc.S}. 
+    
+    Cabe remarcar que la memoria alocada dentro de este código es luego liberada en el código C.\\
     \lstinline{Stack frame} \\
-            \includegraphics[max height=100pt,max width=100pt]{./stack_create_matrix.png}
+            \begin{center}
+              \includegraphics[max height=100pt,max width=100pt]{./stack_create_matrix.png}
+            \end{center}
             \begin{itemize}
                 \item \lstinline{SRA}
                 Se guardaron los registros gp, fp y ra en este área, con 4 bytes de padding para que quede alineada a 8 bytes como dicta la ABI
@@ -125,9 +145,6 @@ Para compilar el programa se utiliza el makefile desde el directorio donde se de
 \begin{lstlisting}
 $ make clean
 $ make all
-gcc -Wall -c dynamic.c
-gcc -o dynamic dynamic.o
-
 \end{lstlisting}
 
 \section{Pruebas}
@@ -162,8 +179,13 @@ Este script de ejecución valida también la impresión del menú y de la versi�
 
 \section{Conclusiones}
 
-Como conclusión se puede ver en principio como al trabajar un programa a nivel de assembly, y necesitar uno crear el stack frame, se tiene pleno control(sin olvidar respetar la ABI) y conocimiento del uso de la memoria principal del programa que se cree.
+En este trabajo pusimos en práctica la definición de un programa en MIPS assembly, lo cual nos lleva a los siguientes aprendizajes y conclusiones:
 
-Se observa a su vez que las gestión de recursos de la máquina es absoluta, tanto en el uso de memoria como de los registros del procesador, pero en detrimento de la legibilidad y de perder herramientas para visualizar errores que van surgiendo durante el desarrollo.
+\begin{itemize}
+  \item Al definir y crear el stack frame dentro de cada función que implementamos, se tiene pleno control (sin olvidar respetar la ABI) y conocimiento del uso de la memoria principal del programa.
+  \item Se observa a su vez que las gestión de recursos de la máquina es absoluta, tanto en el uso de memoria como de los registros del procesador.
+  \item Resulta tedioso al principio valerse de menos herramientas al encontrarnos desarrollando en tan bajo nivel y en un entorno de desarrollo tan cerrado como la máquina virtual con el sistema operativo NetBSD.
+  \item La herramienta de debugging gdb resultó ser muy util a la hora de diagnosticar comportamientos indeseados en el programa en la medida que lo construimos. Permite visualizar de una forma muy práctica los registros y direcciones utilizados en tiempo real durante la ejecución del programa.
+\end{itemize}
 
 \end{document}
