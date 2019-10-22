@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <unistd.h>
+#include "mymalloc.h"
 
 #define VERSION "1.0.0"
 #define INIT_SIZE 2
@@ -41,13 +43,15 @@ typedef struct matrix
 
 matrix_t *create_matrix(size_t rows, size_t cols)
 {
-    matrix_t *matrix = malloc(sizeof(matrix_t));
-    double *array = malloc(sizeof(double) * cols * rows);
+    matrix_t *matrix = mymalloc(sizeof(matrix_t));
+    double *array = mymalloc(sizeof(double) * cols * rows);
     matrix->array = array;
     matrix->cols = cols;
     matrix->rows = rows;
     return matrix;
 }
+
+extern matrix_t *matrix_multiply_2(matrix_t *matrix1, matrix_t *matrix2);
 
 int print_matrix(FILE *fp, matrix_t *m)
 {
@@ -67,33 +71,10 @@ int print_matrix(FILE *fp, matrix_t *m)
     return elementCount;
 }
 
-matrix_t *matrix_multiply(matrix_t *matrix1, matrix_t *matrix2)
-{
-    matrix_t *result = create_matrix(matrix1->rows, matrix2->cols);
-
-    int i = 0;
-    for (; i < matrix1->rows; i++)
-    {
-        int j = 0;
-        for (; j < matrix2->cols; j++)
-        {
-            double acum = 0;
-            int k = 0;
-            for (; k < matrix1->cols; k++)
-            {
-                acum = acum + matrix1->array[matrix1->cols * i + k] * matrix2->array[matrix2->cols * k + j];
-            }
-            result->array[result->cols * i + j] = acum;
-        }
-    }
-
-    return result;
-}
-
 void destroy_matrix(matrix_t *m)
 {
-    free(m->array);
-    free(m);
+    myfree(m->array);
+    myfree(m);
 }
 
 /* ******* Value processing ******* */
@@ -127,7 +108,8 @@ int get_value(double *value_ptr, bool *eol, bool *eof)
         int res = sscanf(buffer, "%lG", value_ptr);
 
         // Si no puede interpretar un double, da error.
-        if (res == 0) {
+        if (res == 0)
+        {
             return -1;
         }
     }
@@ -190,7 +172,7 @@ enum LineEnding process_line()
     if (eol)
     {
         fprintf(stderr, "Invalid format, cannot read matrix\n");
-        return Error;
+        return Error;    
     }
 
     if (res <= 0)
@@ -230,7 +212,7 @@ enum LineEnding process_line()
         return Error;
     }
 
-    matrix_t *result = matrix_multiply(matrix1, matrix2);
+    matrix_t *result = matrix_multiply_2(matrix1, matrix2);
 
     printf("%zu ", dim);
     print_matrix(stdout, result);

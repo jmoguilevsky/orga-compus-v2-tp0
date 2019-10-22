@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -std=c99 -Wall -Werror -pedantic -pedantic-errors
+CFLAGS= -Wall
 .PHONY: all
 
 all: dynamic
@@ -7,5 +7,5 @@ all: dynamic
 clean:
 	rm -rf *.o
 
-dynamic: dynamic.o
-	$(CC) -o dynamic dynamic.o
+dynamic: dynamic.o matrix_multiply.o mymalloc.o
+	$(CC) -o dynamic dynamic.o matrix_multiply.o mymalloc.o
