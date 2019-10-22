@@ -58,14 +58,14 @@ Este trabajo práctico grupal tiene como objetivo principal.
     frame,
     scale=.65,
     pagecommand=\section{Enunciado}
- ]{tp1-2019-2q.pdf}
+ ]{./tp1-2019-2q.pdf}
 \includepdf[
     trim=20mm 30mm 10mm 25mm, clip,
     pages=2-,
     frame,
     scale=.65,
     pagecommand={}
- ]{tp1-2019-2q.pdf}
+ ]{./tp1-2019-2q.pdf}
 
 \section{Solución}
 
@@ -75,7 +75,7 @@ Se conservaron del código escrito para el anterior trabajo práctico las funcio
 Por otra parte, se implementaron en lenguaje assembly de MIPS las funciones \textbf{matrix\_multiply} y \textbf{create\_matrix}
 
 \subsubsection{matrix\_multiply}
-Función encargada del cálculo del producto de las matrices ingresadas.
+Función encargada del cálculo del producto de las matrices ingresadas. \\
     \lstinline{Stack frame} \\
             \includegraphics[max height=100pt,max width=100pt]{./stack_matrix_multiply.png}
             \begin{itemize}
@@ -85,10 +85,10 @@ Función encargada del cálculo del producto de las matrices ingresadas.
                 Se reservaron espacios de memoria para las variables i, j y k que son los contadores utilizados en los distintos loops, 8 bytes para la variable acum utilizada para guardar los resultados parciales, y result que es utilizado como puntero a la estructura que guarda el resultado final.
             \end{itemize}
 
-            \lstinline{} Además, se definieron las constantes STACK\_SIZE(tamaño del stack), OFFSET\_RA, OFFSET\_FP y OFFSET\_GP para los offsets de las posiciones de memoria donde se guardaran los registros ra, fp y gp respectivamente
+           Además, se definieron las constantes STACK\_SIZE(tamaño del stack), OFFSET\_RA, OFFSET\_FP y OFFSET\_GP para los offsets de las posiciones de memoria donde se guardaran los registros ra, fp y gp respectivamente
 
 \subsubsection{create\_matrix}
-    Función encargada de reservar memoria para una matriz con las dimensiones recibidas por parametro
+    Función encargada de reservar memoria para una matriz con las dimensiones recibidas por parametro \\
     \lstinline{Stack frame} \\
             \includegraphics[max height=100pt,max width=100pt]{./stack_create_matrix.png}
             \begin{itemize}
@@ -97,7 +97,7 @@ Función encargada del cálculo del producto de las matrices ingresadas.
                 \item \lstinline{LTA}
                 Se reserva una posicion en el stack donde se guardará la dirección de memoria de la matriz creada
             \end{itemize}
-    \lstinline Además, se definieron las siguientes constantes;
+     Además, se definieron las siguientes constantes:
         \begin{itemize}
             \item \lstinline{STACK_SIZE_CREATE_MATRIX:} tamaño stack
             \item \lstinline{OFFSET_RA_CREATE_MATRIX:} offset ra
@@ -125,7 +125,7 @@ Para compilar el programa se utiliza el makefile desde el directorio donde se de
 \begin{lstlisting}
 $ make clean
 $ make all
-gcc -std=c99 -Wall -Werror -pedantic -pedantic-errors  -c dynamic.c
+gcc -Wall -c dynamic.c
 gcc -o dynamic dynamic.o
 
 \end{lstlisting}
